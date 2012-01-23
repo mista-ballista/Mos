@@ -9,15 +9,17 @@ hojd=0;
 %M is the mass of the bow and k is a factor which represents the sum of the
 %KE’s of the moving parts of the bow. (k for medieval bows range from 0.03 and 0.07
 
-
+theta = 45;
 v = sqrt((e*F*l)/(m+k*M));
-R=(v^2)/g;
+R= (v^2)*sind(2*theta)/g;
+% R=(v^2)/g;
 
 t = [0:0.01:7.63];
 langd= t*v;
-hojd=(langd-((g*langd.^2)/(2*(v*(1/sqrt(2)))^2)))-hojd;
 
-hojd1=(v^2)/(2*g);
+hojd=(langd-((g*langd.^2)/(2*(v*cosd(theta))^2)))-hojd;
+
+hojd1=((v^2)*sind(2*theta))/(2*g);
 tmax = 2*(hojd/v);
 
 
