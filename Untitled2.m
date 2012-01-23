@@ -48,7 +48,7 @@ drawnow
 
 lat = hojd;
 lon = langd;
-bea = -hojd./100;
+bea = hojd./100;
 % lon = [0 1 2 3 4 5 6 7 8 9 10];
 % lat = [0 1 1 1 1 1 -0.5 -1 -1];
 % bea = [0.5 0.4 0.3 0.2 0.1 0 -0.1 -0.2 -0.3 -0.4 -0.5 -0.5 ];
@@ -58,5 +58,5 @@ for i = 1:numel(lat)
     rotx = makehgtform('xrotate',bea(i));
     set(t,'Matrix',trans*rotx);
 %     set(t,'Matrix',trans);
-    pause
+    pause(0.01)
 end
