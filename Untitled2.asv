@@ -10,14 +10,14 @@ hojd=0;
 %KE’s of the moving parts of the bow. (k for medieval bows range from 0.03 and 0.07
 
 theta = 45;
-v = sqrt((e*F*l)/(m+k*M));
+v = 
 R= (v^2)*sind(2*theta)/g;
 % R=(v^2)/g;
 
 t = [0:0.01:7.63];
 langd= t*v;
-hojd=(langd-((g*langd.^2)/(2*(v*(1/sqrt(2)))^2)))-hojd;
-(langd-((g*langd.^2)/(2*(v*(
+
+hojd=(langd-((g*langd.^2)/(2*(v*cosd(theta))^2)))-hojd;
 
 hojd1=((v^2)*sind(2*theta))/(2*g);
 tmax = 2*(hojd/v);
@@ -48,7 +48,7 @@ drawnow
 
 lat = hojd;
 lon = langd;
-bea = -hojd./100;
+bea = hojd./100;
 % lon = [0 1 2 3 4 5 6 7 8 9 10];
 % lat = [0 1 1 1 1 1 -0.5 -1 -1];
 % bea = [0.5 0.4 0.3 0.2 0.1 0 -0.1 -0.2 -0.3 -0.4 -0.5 -0.5 ];
@@ -58,5 +58,5 @@ for i = 1:numel(lat)
     rotx = makehgtform('xrotate',bea(i));
     set(t,'Matrix',trans*rotx);
 %     set(t,'Matrix',trans);
-    pause
+    pause(0.01)
 end

@@ -10,7 +10,7 @@ hojd=0;
 %KE’s of the moving parts of the bow. (k for medieval bows range from 0.03 and 0.07
 
 theta = 45;
-v = sqrt((e*F*l)/(m+k*M));
+v = 
 R= (v^2)*sind(2*theta)/g;
 % R=(v^2)/g;
 
