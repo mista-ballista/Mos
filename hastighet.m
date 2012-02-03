@@ -55,7 +55,7 @@ for i=1:size(x,2)-1
 % thetaprim(i) = 1/(L* sqrt(1-(x(i)-L0*cos(a(i)))^2/L^2));
 % Fel här, a ska gå från 90 grader och minska ner till max 45? 2.55
 % hårdkodat för att få rätt, men blir orimliga värden
-a(i)=2.55 - asin((Y0+L*cos(theta(i))/L0));
+a(i)=asin((Y0+L*cos(theta(i))/L0));
 
 xprim(i) = L*(cos(a(i)-theta(i))/cos(a(i)));
 xbiss(i) = L*(sin(a(i)-theta(i)/cos(a(i))))-(L^2/L0)*(sin(theta(i))^2/cos(a(i))^3);
