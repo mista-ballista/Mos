@@ -5,7 +5,7 @@ clc;
 g=9.82; %gravitation
 vinkel= 45; %utgångsvinkel
 y0=1; %Start höjd
-draTillbaka = 0.6; %Hur långt vi drar pilen
+draTillbaka = 0.1;%Hur långt vi drar pilen
 v = hastighet(draTillbaka); %Pilens utgångshastighet när tilen dras tillbaka
 
 % Total distance

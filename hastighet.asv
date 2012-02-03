@@ -1,4 +1,4 @@
-function [ vArrow ] = hastighet( xdrag )
+% function [ vArrow ] = hastighet( xdrag )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -7,6 +7,7 @@ function [ vArrow ] = hastighet( xdrag )
 
 clc
 close all
+
 % Moment of inertia
 % b=0.3;
 % h=0.5;
@@ -94,4 +95,3 @@ figure;
 plot(xbiss);
 title('strängens acceleration');
 vArrow
-end
