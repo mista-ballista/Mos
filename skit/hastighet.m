@@ -1,3 +1,7 @@
+function [ vArrow ] = hastighet( xdrag )
+%UNTITLED2 Summary of this function goes here
+%   Detailed explanation goes here
+
 % L*sin(X)+L0cos(arcsin((Y0+L*cos(X))/L0))=x find X
 % 0.75*sin(X)+0.95cos(arcsin((0.25+0.75*cos(X))/0.95))=1
 
@@ -23,7 +27,7 @@ m = 0.2; %Massan på pilen
 theta0=acos((L-Y0)/L0); %Startvinkel
 x0=L*sin(theta0); %Stränghöjd i startläge
 
-x = [1:-0.001:x0]; %Dra upp till 1 meters längd
+x = [x0+xdrag:-0.001:x0]; %Dra upp till 1 meters längd
 
 %Moment of inertia från pdf
 I = 0.3*M*L^2;
@@ -49,11 +53,7 @@ E(i) =(0.5*m*xprim(i)^2+I)*thetaprim(i)+k*(theta(i)^2-theta0^2); %Kinetic energy
 % E = 1/2 *mv^2
 v(i) = sqrt((2*-E(i))/m);
 
+vArrow = v(size(x,2));
 
-
-
-
-
-
-
+end
 

@@ -18,10 +18,10 @@ Y0 = 0.25; %Längd på handtag
 M = 0.93; %Massan på lemmar
 
 kappa =620; %Fjäder konstant för bågen
-m = 0.25; %Massan på pilen
+m = 0.2; %Massan på pilen
 
-theta0=acosd((L-Y0)/L0); %Startvinkel
-x0=L*sind(theta0); %Stränghöjd i startläge
+theta0=acos((L-Y0)/L0); %Startvinkel
+x0=L*sin(theta0); %Stränghöjd i startläge
 
 x = [1:-0.001:x0]; %Dra upp till 1 meters längd
 
@@ -49,7 +49,7 @@ E(i) =(0.5*m*xprim(i)^2+I)*thetaprim(i)+k*(theta(i)^2-theta0^2); %Kinetic energy
 % E = 1/2 *mv^2
 v(i) = sqrt((2*-E(i))/m);
 
-end
+
 
 
 
