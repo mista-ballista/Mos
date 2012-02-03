@@ -3,11 +3,12 @@ vinkel= 45;
 hojd=0;
 y0=0; %Start höjd
 v =hastighet(0.6);
-R= (v^2)*sind(2*vinkel)/g;
+% R= (v^2)*sind(2*vinkel)/g;
 % R=(v^2)/g;
 
 % Total distance
-d = (v*cosd(vinkel)/g)*(v*sind(vinkel)+sqrt((v*sind(vinkel)^2+2*g*y0)));
+d = (v*cosd(vinkel)/g)*(v*sind(vinkel)+sqrt(((v*sind(vinkel))^2+2*g*y0)));
+
 
 maxhojd=((v^2)*sind(2*vinkel))/(2*g);
 timeOfFlight = d/(v*cosd(vinkel));
@@ -27,6 +28,7 @@ xv = v*cosd(vinkel);
 % Hastighet i y led
 yv = v*sind(vinkel)-(g*x)/(v*cosd(vinkel));
 
+plot(x,y);
 %3D
 % ax= axes('Xlim', [-50 50], 'YLim', [-10 600], 'ZLim', [0 200]);
 % view(3);
