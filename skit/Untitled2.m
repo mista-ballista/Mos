@@ -4,6 +4,8 @@ hojd=0;
 y0=0; %Start höjd
 v =hastighet(0.6);
 R= (v^2)*sind(2*vinkel)/g;
+
+v0y = v *sind(vinkel); 
 % R=(v^2)/g;
 
 % Total distance
@@ -12,7 +14,11 @@ d = (v*cosd(vinkel)/g)*(v*sind(vinkel)+sqrt((v*sind(vinkel)^2+2*g*y0)));
 maxhojd=((v^2)*sind(2*vinkel))/(2*g);
 timeOfFlight = d/(v*cosd(vinkel));
 
-t = [0:0.01:timeOfFlight];
+d
+
+yv = v*sind(vinkel)-(g*x)/(v*cosd(vinkel));
+t = 0:0.01:2*v0y/g;
+% t = [0:0.01:timeOfFlight];
 % X kord för pil
 x= t*v;
 % Y kord för pil
@@ -25,7 +31,9 @@ vabs = sqrt(v^2-2*g*x.*tand(vinkel)+((g*x)/(v*cosd(vinkel))^2));
 xv = v*cosd(vinkel);
 
 % Hastighet i y led
-yv = v*sind(vinkel)-(g*x)/(v*cosd(vinkel));
+
+plot(x,y)
+
 
 %3D
 % ax= axes('Xlim', [-50 50], 'YLim', [-10 600], 'ZLim', [0 200]);

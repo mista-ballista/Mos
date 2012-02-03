@@ -1,21 +1,35 @@
-g=9.82;
-vinkel= 45;
-hojd=0;
-y0=0; %Start höjd
-v =hastighet(0.6);
-R= (v^2)*sind(2*vinkel)/g;
-% R=(v^2)/g;
+g=9.82; %gravitation
+vinkel= 45; %utgångsvinkel
+y0=0; %Start höjd, backens-nivå
+v0 = hastighet(0.6); %pilens utgångshastighet från ballistan
 
-maxhojd=((v^2)*sind(2*vinkel))/(2*g);
-timeOfFlight = R/(v*cos(vinkel));
+v0y = v *sind(vinkel); %utgångshastighet i y-led
+v0x = v *cosd(vinkel); %utgångshastighet i x-led
 
-t = [0:0.01:timeOfFlight];
+
+% Total distance
+d = (v*cosd(vinkel)/g)*(v*sind(vinkel)+sqrt((v*sind(vinkel)^2+2*g*y0)));
+
+maxhojd = ((v^2)*sind(2*vinkel))/(2*g);
+timeOfFlight = d/(v*cosd(vinkel));
+
+yv = v*sind(vinkel)-(g*x)/(v*cosd(vinkel));
+t = 0:0.01:2*v0y/g;
+% t = [0:0.01:timeOfFlight];
 % X kord för pil
 x= t*v;
 % Y kord för pil
-y= y0+x.*tand(vinkel)-(g*x.^2)/(2*((v*cos(vinkel))^2));
+y= y0+x.*tand(vinkel)-(g*x.^2)/(2*((v*cosd(vinkel))^2));
 
 % Hastighet vid X
+vabs = sqrt(v^2-2*g*x.*tand(vinkel)+((g*x)/(v*cosd(vinkel))^2));
+
+% hastighet i x led
+xv = v*cosd(vinkel);
+
+% Hastighet i y led
+
+plot(x,y)
 
 
 %3D
