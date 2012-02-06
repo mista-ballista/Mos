@@ -26,7 +26,7 @@ yv = v*sind(vinkel)-(g*x)/(v*cosd(vinkel));
 
 % Y kord för pil
 y= y0+x.*tand(vinkel)-(g*x.^2)/(2*((v*cosd(vinkel))^2));
-
+figure;
 plot(x,y);
 axis equal;
 
