@@ -28,7 +28,7 @@ theta0= 0.3491;
 % theta0=acos((L0-Y0)/L); %Startvinkel
 x0=L*sin(theta0); %Stränghöjd i startläge
 L0 = Y0+L*cos(theta0);
-
+a0= asin((Y0+L*cos(theta0))/L0);
 x = [x0+xdrag:-0.001:x0]; %Dra upp till xdrag
 
 %Moment of inertia från pdf
@@ -50,7 +50,7 @@ for i=1:size(x,2)
         L^4* L0^2+2* x(i)^2* L^4* Y0^2-x(i)^2* L^2* L0^4+2* x(i)^2* L^2* L0^2* Y0^2-x(i)^2* L^2* Y0^4)+L^3 *(-Y0)+L* L0^2*...
         Y0-L* Y0^3)/(2* (x(i)^2* L^2+L^2* Y0^2)));
 end
-% 
+%
 theta1 = theta(2:size(theta));
 theta2 = theta(1:size(theta)-1);
 thetaprim = theta1 - theta2;
