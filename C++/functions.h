@@ -5,5 +5,6 @@
 
 float rsum(float a, float b, int n);
 float force(float _drawLength);
+void Arrowpos();
 
 #endif
