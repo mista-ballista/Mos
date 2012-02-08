@@ -1,17 +1,17 @@
 #include <math.h>
 #include <iostream>
+#include <vector>
 #include "functions.h"
 
 using namespace std;
 
+const float Pi = 3.1415926535897932384626433832795f;
+const float _theta0 = 0.3491f;
+
 float value=0;
 float dx;
 float c;
-float _limbLength;
-float _arrowMass;
 float g;
-float theta0;
-float x0;
 float _vinkel;
 float _totalDrag;
 float _pullBack;
@@ -29,7 +29,6 @@ float _halfHandle; //Längd på handtaget
 float _mLimb; // Massan på lämmarna
 float _kappa; //Fjäderkonstant för bågen
 float _mArrow; //Massa på pilen
-float _theta0; //Startvinkel 20grader i rad
 float _x0; //Stränghöjd i startläget
 float _l0; //Halva strängens längd
 float _k; //Fjäderkonstant relativt vinklarish
@@ -66,7 +65,6 @@ float force(float _drawLength)
 	_mLimb = 0.093f; 
 	_kappa = 620.0f;
 	_mArrow = 0.025f;
-	_theta0 = 0.3491f;
 
 	//KOD!
 	_x0 = _l * sin(_theta0);
@@ -97,50 +95,51 @@ float force(float _drawLength)
 	
 	_f = 2 * (_k / _l) *  _theta * (cos(_alpha) / cos(_alpha - _theta));
 
-	cout << _f <<endl;
     return _f;
 }
 
-//Arrowpos(float t)
-//{
-//_limbLength = 0.5; /*Lemmarnas längd*/
-//_arrowMass = 0.025; /*Massan på pilen*/
-//
-//theta0= 0.3491;
-//
-//x0=_limbLength*sin(theta0); /*Stränghöjd i startläge*/
-//
-//
-//
-//
-//g=9.82; /*gravitation*/
-//_vinkel= 45*Pi/180; /*utgångsvinkel*/
-//_BallistaHeight=1; /*Start höjd*/
-//_totalDrag = 0.7;
-//_pullBack = 0.7-x0; /*Hur långt vi drar pilen*/
-//m = 0.025; /*%Massan på pilen*/
-//_work = rsum(_pullBack,x0,600); /*Pilens utgångshastighet när tilen dras tillbaka*/
-//
-//v = sqrt(2*-_work/m);
-//
-//// Total distance
-//_totalDistance = (v*cos(_vinkel)/g)*(v*sin(vinkel)+sqrt(((v*sind(vinkel))^2+2*g*_BallistaHeight)));
-//
-////hastighet i x led
-//_timeOfFlight = (v*sind(vinkel)+sqrt(((v*sind(vinkel))^2+2*g*_BallistaHeight)))/g; /*hur lång tid som pilen är i luften*/
-//t = [0:0.0001:_timeOfFlight];
-//
-//xv = v*cosd(vinkel); /*v0 i x-led*/
-//x= t*xv; /*% X kord för pil*/
-//
-//// Hastighet vid X
-//// vabs = sqrt(v^2-2*g*x.*tand(vinkel)+((g*x)/(v*cosd(vinkel))^2));
-//
-//// Hastighet i y led
-//yv = v*sind(vinkel)-(g*x)/(v*cosd(vinkel));
-//
-//// Y kord för pil
-//y= _BallistaHeight+x.*tand(vinkel)-(g*x.^2)/(2*((v*cosd(vinkel))^2));
-//
-//
-//}
+void Arrowpos()
+{
+	vector<float> t;
+	vector<float> x;
+	vector<float> yv;
+	vector<float> y;
+	
+
+	_l = 0.5f; /*Lemmarnas längd*/
+	_mArrow = 0.025f; /*Massan på pilen*/
+	_x0 = _l*sin(_theta0); /*Stränghöjd i startläge*/
+	g = 9.82f; /*gravitation*/
+	_vinkel= (45.0f*Pi/180.0f); /*utgångsvinkel*/
+	_BallistaHeight = 1.0f; /*Start höjd*/
+	_totalDrag = 0.7f;
+	_pullBack = _totalDrag-_x0; /*Hur långt vi drar pilen*/
+	_work = rsum(_pullBack,_x0,600); /*Pilens utgångshastighet när tilen dras tillbaka*/
+	xv = v*cos(_vinkel); /*v0 i x-led*/
+	
+
+	v = sqrt(2*-_work/_mArrow);
+
+	// Total distance
+	float temp = pow((v*sin(_vinkel)),2);
+	float temp2 = pow((v*cos(_vinkel)),2);
+	_totalDistance = (v*cos(_vinkel)/g)*(v*sin(_vinkel)+sqrt(temp+2*g*_BallistaHeight));
+
+	//hastighet i x led
+	 
+	_timeOfFlight = (v*sin(_vinkel)+sqrt((temp + 2*g*_BallistaHeight)))/g; /*hur lång tid som pilen är i luften*/
+	//t = [0:0.0001:_timeOfFlight];
+	int index = 0;
+	for (float i=0.0f; i<_timeOfFlight; i+=0.0001f)
+	{
+		t.push_back(i);	
+		x.push_back(t[index]*xv); /*% X kord för pil*/
+		yv.push_back(v*sin(_vinkel)-(g*x[index])/(v*cos(_vinkel)));// Hastighet i y led
+		y.push_back(_BallistaHeight+x[index]*tan(_vinkel)-(g*pow(x[index],2))/(2*temp2));// Y kord för pil
+		index++;
+	}	
+
+	// Hastighet vid X
+	// vabs = sqrt(v^2-2*g*x.*tand(vinkel)+((g*x)/(v*cosd(vinkel))^2));
+	cout << v;
+}
