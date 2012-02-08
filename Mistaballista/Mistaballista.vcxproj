@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{AC966C47-D2A2-422D-869E-4ED0DCC73A41}</ProjectGuid>
-    <RootNamespace>mistaballista</RootNamespace>
+    <ProjectGuid>{4ADC0B88-47DA-49FD-951D-F69A2E10F206}</ProjectGuid>
+    <RootNamespace>Mistaballista</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -60,13 +60,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="mistaballista.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="rsum1.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
