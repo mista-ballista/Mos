@@ -4,6 +4,7 @@ function value=rsum1(a,b,n)
 %The points on the intervals are chosen as the right endpoints.
 value = 0;
 dx = (b-a)/n;
+dx
 for k=1:n
 c = a+k*dx;
 value = value + kraft(c);

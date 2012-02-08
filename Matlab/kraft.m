@@ -26,11 +26,11 @@ theta = acos((-x^2* L * Y0+sqrt(x^6 *(-L^2)+2* x^4* L^4+2* x^4* L^2* L0^2-2* x^4
         L^4* L0^2+2* x^2* L^4* Y0^2-x^2* L^2* L0^4+2* x^2* L^2* L0^2* Y0^2-x^2* L^2* Y0^4)+L^3 *(-Y0)+L* L0^2*...
         Y0-L* Y0^3)/(2* (x^2* L^2+L^2* Y0^2)));
 
-
     
     
 a=asin((Y0+L*cos(theta))/L0);
 
+a
 
 F = 2*(k/L)*theta*(cos(a)/cos(a-theta));
 
