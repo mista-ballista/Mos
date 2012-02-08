@@ -60,7 +60,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+<<<<<<< HEAD
+=======
     <ClCompile Include="force.cpp" />
+>>>>>>> orgin/master
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

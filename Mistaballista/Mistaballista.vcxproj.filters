@@ -15,9 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
+=======
     <ClCompile Include="force.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+>>>>>>> orgin/master
     <ClCompile Include="functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
