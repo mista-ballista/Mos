@@ -72,20 +72,8 @@ for i=1:size(x,2)-1
     
     F(i) = 2*(k/L)*theta(i)*(cos(a(i))/cos(a(i)-theta(i)));
     
-    if i==1
-        
-       Etot = Etot+E(i);
-        
-    else
-        
-        Etot =Etot + E(i-1) -E(i);
-    end
+   
 end
-
-test1 = F(1:end-1);
-test2 = F(2:end);
-
-test = sum(test1)+sum(test2);
 
 
 plot(a*180/pi);
@@ -95,21 +83,9 @@ plot(theta*180/pi);
 title('Theta i grader');
 figure;
 
-plot(E);
-title('E');
-figure;
-
-plot(v);
-title('v');
-
-figure;
-plot(xnock);
-title('stränges mittpunkt');
-
-figure;
-plot(xprim);
-title('strängens hastighet');
 
 
+plot(F);
+title('kraften')
 
 % end
