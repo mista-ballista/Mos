@@ -20,10 +20,10 @@ float _BallistaHeight;
 float _totalDistance;
 float _timeOfFlight;
 float v;
-float x;
+//float x;
 float xv;
-float yv;
-float y;
+//float yv;
+//float y;
 float _l; //Lemmarnas längd
 float _halfHandle; //Längd på handtaget
 float _mLimb; // Massan på lämmarna
@@ -37,8 +37,11 @@ float _i; //Moment of inertia;
 float _theta; //Lemmens vinkel
 float _alpha; //Vinkel mellan sträng och pil
 float _f; //kraften
-
-
+vector<float> t;
+vector<float> x;
+vector<float> yv;
+vector<float> y;
+float _steglangd = 0.001f;
 
 
 
@@ -100,12 +103,6 @@ float force(float _drawLength)
 
 void Arrowpos()
 {
-	vector<float> t;
-	vector<float> x;
-	vector<float> yv;
-	vector<float> y;
-	
-
 	_l = 0.5f; /*Lemmarnas längd*/
 	_mArrow = 0.025f; /*Massan på pilen*/
 	_x0 = _l*sin(_theta0); /*Stränghöjd i startläge*/
@@ -115,11 +112,10 @@ void Arrowpos()
 	_totalDrag = 0.7f;
 	_pullBack = _totalDrag-_x0; /*Hur långt vi drar pilen*/
 	_work = rsum(_pullBack,_x0,600); /*Pilens utgångshastighet när tilen dras tillbaka*/
-	xv = v*cos(_vinkel); /*v0 i x-led*/
 	
 
 	v = sqrt(2*-_work/_mArrow);
-
+	xv = v*cos(_vinkel); /*v0 i x-led*/
 	// Total distance
 	float temp = pow((v*sin(_vinkel)),2);
 	float temp2 = pow((v*cos(_vinkel)),2);
@@ -130,16 +126,55 @@ void Arrowpos()
 	_timeOfFlight = (v*sin(_vinkel)+sqrt((temp + 2*g*_BallistaHeight)))/g; /*hur lång tid som pilen är i luften*/
 	//t = [0:0.0001:_timeOfFlight];
 	int index = 0;
-	for (float i=0.0f; i<_timeOfFlight; i+=0.0001f)
+	
+	for (float i=0.0f; i<_timeOfFlight; i+=_steglangd)
 	{
 		t.push_back(i);	
 		x.push_back(t[index]*xv); /*% X kord för pil*/
 		yv.push_back(v*sin(_vinkel)-(g*x[index])/(v*cos(_vinkel)));// Hastighet i y led
 		y.push_back(_BallistaHeight+x[index]*tan(_vinkel)-(g*pow(x[index],2))/(2*temp2));// Y kord för pil
-		index++;
+		index++;		
+		
 	}	
 
 	// Hastighet vid X
 	// vabs = sqrt(v^2-2*g*x.*tand(vinkel)+((g*x)/(v*cosd(vinkel))^2));
-	cout << v;
+	cout << xv << endl;
+	cout << v << endl;
+	cout << _totalDistance << endl;
+	cout << _timeOfFlight << endl;
+}
+
+float getArrowposX(float time)
+{
+	float xpos;
+	int index = time / _steglangd;
+	//cout << index << endl;
+	if(index < x.size())
+	{
+		xpos = x.at(index);
+	}
+	else
+	{
+		xpos = x.back();
+	}
+	cout << xpos << endl;
+	return xpos;
+	
+}
+
+float getArrowposY(float time)
+{	float ypos;
+	int index = time / _steglangd;
+	if(index < y.size())
+	{
+	 ypos = y.at(index);
+	}
+	else
+	{
+		 ypos = y.back();
+	}
+	cout << ypos << endl;
+	return ypos;
+	
 }
