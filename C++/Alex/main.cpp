@@ -278,7 +278,6 @@ void Draw(void)
  
     // ----- Stop Drawing Stuff! ------
  
-    glfwSwapBuffers(); // Swap the buffers to display the scene (so we don't have to watch it being drawn!)
 
 }
 
