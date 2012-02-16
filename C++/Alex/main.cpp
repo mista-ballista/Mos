@@ -257,24 +257,28 @@ void Draw(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
  
-    // Move the camera to our location in space
-    glRotatef(getCamXRot(), 1.0f, 0.0f, 0.0f);        // Rotate our camera on the x-axis (looking up and down)
-    glRotatef(getCamYRot(), 0.0f, 1.0f, 0.0f);        // Rotate our camera on the  y-axis (looking left and right)
-    glTranslatef(-getCamXpos(),-getCamYpos(),-getCamZpos());    // Translate the modelviewm matrix to the position of our camera
-	
+    //// Move the camera to our location in space
+    //glRotatef(getCamXRot(), 1.0f, 0.0f, 0.0f);        // Rotate our camera on the x-axis (looking up and down)
+    //glRotatef(getCamYRot(), 0.0f, 1.0f, 0.0f);        // Rotate our camera on the  y-axis (looking left and right)
+    //glTranslatef(-getCamXpos(),-getCamYpos(),-getCamZpos());    // Translate the modelviewm matrix to the position of our camera
+	Move_Camera();
 
-	Draw_3DSquare();
-    //// Draw the lower ground-grid
-    //drawGround();
+	//Draw_3DSquare();
+    // Draw the lower ground-grid
+    drawGround();
  
-    //// Draw the upper ground-grid, keeping a copy of our current matrix on the stack before we translate it
-    //glPushMatrix();
+    // Draw the upper ground-grid, keeping a copy of our current matrix on the stack before we translate it
+    glPushMatrix();
  
-    //glTranslatef(0.0f, 200.0f, 0.0f);
+    glTranslatef(0.0f, 200.0f, 0.0f);
  
-    //drawGround();
+    drawGround();
+
+	//Draw_3DSquare();
  
-    //glPopMatrix();
+    glPopMatrix();
+
+
  
     // ----- Stop Drawing Stuff! ------
  

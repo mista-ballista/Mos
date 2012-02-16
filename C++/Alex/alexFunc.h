@@ -16,6 +16,7 @@ void drawGround();
 float toRads(const float &theAngleInDegrees);
 void calculateCameraMovement();
 void handleKeypress(int theKey, int theAction);
+void Move_Camera();
 
 GLfloat getCamXpos();
 GLfloat getCamYpos();

@@ -270,6 +270,17 @@ void drawGround()
  
 }
 
+
+//Flytta kameran
+void Move_Camera()
+{
+	// Move the camera to our location in space
+    glRotatef(getCamXRot(), 1.0f, 0.0f, 0.0f);        // Rotate our camera on the x-axis (looking up and down)
+    glRotatef(getCamYRot(), 0.0f, 1.0f, 0.0f);        // Rotate our camera on the  y-axis (looking left and right)
+    glTranslatef(-getCamXpos(),-getCamYpos(),-getCamZpos());    // Translate the modelviewm matrix to the position of our camera
+}
+
+
 // Function to convert degrees to radians
 float toRads(const float &theAngleInDegrees)
 {
