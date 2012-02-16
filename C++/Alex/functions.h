@@ -8,6 +8,7 @@ float force(float _drawLength);
 void Arrowpos();
 float getArrowposX(float time);
 float getArrowposY(float time);
+double getTimeOfFlight();
 
 
 #endif

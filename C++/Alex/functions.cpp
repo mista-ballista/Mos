@@ -178,3 +178,9 @@ float getArrowposY(float time)
 	return ypos;
 	
 }
+
+double getTimeOfFlight()
+{
+
+	return _timeOfFlight;
+}
