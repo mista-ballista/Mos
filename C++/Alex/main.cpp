@@ -19,6 +19,9 @@ using namespace std;
 string objname = "Data/arrow.obj";
 char texname[] = "Data/johda2.tga";
 
+int frames = 0;
+double t0 = 0.0;
+char titlestring[200];
 
 GLuint	texture[1];
  
@@ -57,6 +60,26 @@ int main(void)
 	Main_Loop();
 	Shut_Down(0);
 }
+
+
+void showFPS() {
+
+    double t, fps;
+    
+    // Get current time
+    t = glfwGetTime();  // Gets number of seconds since glfwInit()
+    // If one second has passed, or if this is the very first frame
+    if( (t-t0) > 1.0 || frames == 0 )
+    {
+        fps = (double)frames / (t-t0);
+        sprintf(titlestring, "Mista Ballista (%.1f FPS)", fps);
+        glfwSetWindowTitle(titlestring);
+        t0 = t;
+        frames = 0;
+    }
+    frames ++;
+}
+
  
 void Init(void)
 {
@@ -85,7 +108,7 @@ void Init(void)
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 
-    glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
+    //glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
  
     glLineWidth(2.0f);			// Set a 'chunky' line width
 
@@ -124,7 +147,7 @@ void Main_Loop(void)
 	  moveArrow(current_time);
 	*/
 
-	  
+	  showFPS();
 	//Stäng av om esc 
 	if (glfwGetKey(GLFW_KEY_ESC) || !glfwGetWindowParam(GLFW_OPENED))
 		break;
@@ -238,26 +261,20 @@ void Draw(void)
     glRotatef(getCamXRot(), 1.0f, 0.0f, 0.0f);        // Rotate our camera on the x-axis (looking up and down)
     glRotatef(getCamYRot(), 0.0f, 1.0f, 0.0f);        // Rotate our camera on the  y-axis (looking left and right)
     glTranslatef(-getCamXpos(),-getCamYpos(),-getCamZpos());    // Translate the modelviewm matrix to the position of our camera
- 
-    // Draw the lower ground-grid
-    drawGround();
- 
-    // Draw the upper ground-grid, keeping a copy of our current matrix on the stack before we translate it
-    glPushMatrix();
- 
-    glTranslatef(0.0f, 200.0f, 0.0f);
- 
-    drawGround();
- 
-    glPopMatrix();
-	glPushMatrix();
-	Draw_3DSquare();
-	glPopMatrix();
-		
 	
 
-
-     
+	Draw_3DSquare();
+    //// Draw the lower ground-grid
+    //drawGround();
+ 
+    //// Draw the upper ground-grid, keeping a copy of our current matrix on the stack before we translate it
+    //glPushMatrix();
+ 
+    //glTranslatef(0.0f, 200.0f, 0.0f);
+ 
+    //drawGround();
+ 
+    //glPopMatrix();
  
     // ----- Stop Drawing Stuff! ------
  
