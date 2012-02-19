@@ -25,7 +25,7 @@ GLfloat fieldOfView = 45.0f;                 // Define our field of view (i.e. h
 GLfloat near        = 1.0f;                  // The near (Z Axis) point of our viewing frustrum (default 1.0f)
 GLfloat far         = 1500.0f;               // The far  (Z Axis) point of our viewing frustrum (default 1500.0f)
 
-GLfloat movementSpeedFactor = 3.0f;
+GLfloat movementSpeedFactor = 1.0f;
 
 // Camera rotation
 GLfloat camXRot = 0.0f;
@@ -36,6 +36,10 @@ GLfloat camZRot = 0.0f;
 GLfloat camXPos = 0.0f;
 GLfloat camYPos = 0.0f;
 GLfloat camZPos = 0.0f;
+
+//Arrow pos
+GLfloat arrowXpos = 0.0f;
+GLfloat arrowYpos = 0.0f;
  
 // Camera movement speed
 GLfloat camXSpeed = 0.0f;
@@ -47,7 +51,8 @@ bool holdingForward     = false;
 bool holdingBackward    = false;
 bool holdingLeftStrafe  = false;
 bool holdingRightStrafe = false;
-
+bool firetheballista	= false;
+double pushtime			= 0;
 
 
 
@@ -83,18 +88,35 @@ void setViewMatrix ()
 	//	0.0, 1.0, 0.0);
 }
 
-
-void moveArrow(double current_time)
+void calculate_Arrow(double current_time)
 {
 
+	double time = current_time - pushtime;
+	double timeOfFlight = getTimeOfFlight();
 
-	translateX = getArrowposX(current_time);
-	translateY = getArrowposY(current_time);
+	if(firetheballista==true && time < timeOfFlight)
+	{
+
+		translateX = getArrowposX(time);
+		translateY = getArrowposY(time);
+	}
+
+}
 
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef(translateX,translateY,0);
+
+void MOVE_ARROW()
+{
+	 glTranslatef(getArrowXpos(),getArrowYpos(),0);    
+}
+
+GLfloat getArrowXpos()
+{
+	return translateX;
+}
+GLfloat getArrowYpos()
+{
+	return translateY;
 }
 
 void moveCamera()
@@ -271,6 +293,7 @@ void drawGround()
 }
 
 
+
 //Flytta kameran
 void Move_Camera()
 {
@@ -311,6 +334,11 @@ void handleKeypress(int theKey, int theAction)
         case 'D':
             holdingRightStrafe = true;
             break;
+
+		case 'F':
+			firetheballista = true;
+			pushtime = glfwGetTime();
+			break;
  
         default:
             // Do nothing...

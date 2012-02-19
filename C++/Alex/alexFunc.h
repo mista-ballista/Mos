@@ -4,8 +4,10 @@
 
 void setProjectionMatrix();
 void setViewMatrix();
-void moveArrow(double);
-
+void moveArrow();
+GLfloat getArrowXpos();
+GLfloat getArrowYpos();
+void MOVE_ARROW();
 
 void moveCamera();
 void handleMouseMove(int mouseX, int mouseY);
@@ -17,6 +19,8 @@ float toRads(const float &theAngleInDegrees);
 void calculateCameraMovement();
 void handleKeypress(int theKey, int theAction);
 void Move_Camera();
+void calculate_Arrow(double current_time);
+
 
 GLfloat getCamXpos();
 GLfloat getCamYpos();

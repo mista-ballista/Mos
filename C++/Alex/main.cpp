@@ -16,12 +16,13 @@ void Draw(void);
 
 using namespace std;
 
-string objname = "Data/arrow.obj";
+string objname = "Data/Ballista.obj";
 char texname[] = "Data/johda2.tga";
 
 int frames = 0;
 double t0 = 0.0;
 char titlestring[200];
+double current_time = 0.0;
 
 GLuint	texture[1];
  
@@ -101,7 +102,7 @@ void Init(void)
 
   	glEnable(GL_TEXTURE_2D);							// Enable Texture Mapping ( NEW )
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Black Background
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);				// Black Background
 
 	glClearDepth(1.0f);									// Depth Buffer Setup
 	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
@@ -129,7 +130,6 @@ void Main_Loop(void)
 	// the time of the previous frame
 	double old_time = glfwGetTime();
 
-
 	// Specify the function which should execute when a key is pressed or released
 	glfwSetKeyCallback(handleKeypress);
 
@@ -139,13 +139,8 @@ void Main_Loop(void)
 
   // this just loops as long as the program runs
   while(1)
-  {
-	/*  double current_time = glfwGetTime();
-	  keyboardInput();
-
-	  if(current_time < getTimeOfFlight())
-	  moveArrow(current_time);
-	*/
+  {	
+	  double current_time = glfwGetTime();
 
 	  showFPS();
 	//Stäng av om esc 
@@ -163,6 +158,7 @@ void Main_Loop(void)
 	// Move our camera
 	moveCamera();
 
+	calculate_Arrow(current_time);
 
 	// swap back and front buffers
 	glfwSwapBuffers();
@@ -257,26 +253,36 @@ void Draw(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
  
-    //// Move the camera to our location in space
-    //glRotatef(getCamXRot(), 1.0f, 0.0f, 0.0f);        // Rotate our camera on the x-axis (looking up and down)
-    //glRotatef(getCamYRot(), 0.0f, 1.0f, 0.0f);        // Rotate our camera on the  y-axis (looking left and right)
-    //glTranslatef(-getCamXpos(),-getCamYpos(),-getCamZpos());    // Translate the modelviewm matrix to the position of our camera
+
 	Move_Camera();
 
-	//Draw_3DSquare();
-    // Draw the lower ground-grid
-    drawGround();
- 
-    // Draw the upper ground-grid, keeping a copy of our current matrix on the stack before we translate it
-    glPushMatrix();
- 
-    glTranslatef(0.0f, 200.0f, 0.0f);
- 
-    drawGround();
 
-	//Draw_3DSquare();
- 
-    glPopMatrix();
+
+	Draw_3DSquare();
+
+	glPushMatrix();
+
+	//glTranslatef(0.0f, 5.0f, 0.0f);
+
+	MOVE_ARROW();
+
+	Draw_3DSquare();
+
+	glPopMatrix();
+
+	glTranslatef(0.0f, -5.0f, 0.0f);
+
+	Draw_3DSquare();
+	
+	glPopMatrix();
+	
+	glTranslatef(5.0f, 5.0f, 0.0f);
+
+	DrawScene();
+
+	glPopMatrix();
+
+	drawGround();
 
 
  
