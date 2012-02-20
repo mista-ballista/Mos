@@ -9,7 +9,7 @@
 #include <cmath>
 #include <cctype>
 #include <algorithm>
-#include <glfw.h>
+#include <GL/glfw.h>
 
 using namespace std;
 
@@ -17,4 +17,4 @@ void parseObj(	string filename,
 				vector<GLfloat> &vertices, 
 				vector<GLfloat> &texcoords, 
 				vector<GLfloat> &normals, 
-				vector<GLubyte> &indices);
+				vector<GLuint> &indices);

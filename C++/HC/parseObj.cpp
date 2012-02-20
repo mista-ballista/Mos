@@ -9,7 +9,7 @@
 #include <cmath>
 #include <cctype>
 #include <algorithm>
-#include <glfw.h>
+#include <GL/glfw.h>
 
 using namespace std;
 
@@ -31,7 +31,7 @@ void parseObj(	string filename,
 				vector<GLfloat> &vertices, 
 				vector<GLfloat> &texcoords, 
 				vector<GLfloat> &normals, 
-				vector<GLubyte> &indices) 
+				vector<GLuint> &indices) 
 {
 	ifstream inFile;
 	inFile.open(filename.c_str());
@@ -224,6 +224,10 @@ void parseObj(	string filename,
 	for (int i = 0; i < vertexVec.size(); i++)
 	{
 		vertices.push_back(vertexVec[i]);
+
+		//vertices.push_back(vertexVec[ (fVert[i]-1)*3 ]);
+		//vertices.push_back(vertexVec[ (fVert[i]-1)*3 + 1]);
+		//vertices.push_back(vertexVec[ (fVert[i]-1)*3 + 2]);
 		//cout << vertices[i] << " ";
 	}
 	//cout << endl;
@@ -236,8 +240,9 @@ void parseObj(	string filename,
 		//cout << texcoords[i] << " ";
 	}
 	//cout << endl;
+	
 
-	for (int i = 0; i < fNorm.size(); i+=3)
+	for (int i = 0; i < fNorm.size(); i++)
 	{
 		normals.push_back(normalVec[ (fNorm[i]-1)*3 ]);
 		normals.push_back(normalVec[ (fNorm[i]-1)*3 + 1]);
@@ -252,7 +257,7 @@ void parseObj(	string filename,
 		//cout << (int)indices[i] << " ";
 	}
 
-	
+	cout << texcoords.size() << " " << vertices.size() << " " << normals.size() << " " << indices.size() << endl;
 	//cout << endl << "---------------------------------" << endl;
 	
 }
