@@ -46,11 +46,13 @@ float _steglangd = 0.001f;
 
 
 
-void setFireAngle()
+void setFireAngle(float _tempVinkel)
 {
-	cout << "Avfyrningsvinkel i grader?" <<  endl;
-	cin >> _vinkel; 
-	_vinkel = _vinkel*TO_RADS;
+	//cout << "Avfyrningsvinkel i grader?" <<  endl;
+	//cin >> _vinkel; 
+
+	_vinkel = _tempVinkel*TO_RADS;
+
 }
 double getFireAngle()
 {
@@ -114,6 +116,16 @@ float force(float _drawLength)
 
 void Arrowpos()
 {
+
+	x.clear();
+	y.clear();
+	yv.clear();
+	t.clear();
+	_timeOfFlight = 0;
+
+	bool test = x.empty();
+
+	cout << test << endl;
 	_l				= 0.5f; /*Lemmarnas längd*/
 	_mArrow			= 0.025f; /*Massan på pilen*/
 	_x0				= _l*sin(_theta0); /*Stränghöjd i startläge*/
@@ -150,18 +162,19 @@ void Arrowpos()
 	}	
 
 	// Hastighet vid X
-	// vabs = sqrt(v^2-2*g*x.*tand(vinkel)+((g*x)/(v*cosd(vinkel))^2));
-	cout << xv << endl;
-	cout << v << endl;
-	cout << _totalDistance << endl;
-	cout << _timeOfFlight << endl;
+	//// vabs = sqrt(v^2-2*g*x.*tand(vinkel)+((g*x)/(v*cosd(vinkel))^2));
+	//cout << xv << endl;
+	//cout << v << endl;
+	test = x.empty();
+	cout << test << endl;
+	cout << "TotalDistance: "<< _totalDistance << endl;
+	cout << "Time of flight: "<< _timeOfFlight << endl;
 }
 
 float getArrowposX(float time)
 {
 	float xpos;
 	int index = time / _steglangd;
-	//cout << index << endl;
 	if(index < x.size())
 	{
 		xpos = x.at(index);
@@ -170,7 +183,6 @@ float getArrowposX(float time)
 	{
 		xpos = x.back();
 	}
-	cout << xpos << endl;
 	return xpos;
 	
 }
@@ -186,7 +198,6 @@ float getArrowposY(float time)
 	{
 		 ypos = y.back();
 	}
-	cout << ypos << endl;
 	return ypos;
 	
 }

@@ -9,10 +9,14 @@ const float TO_RADS = 3.141592654f / 180.0f;
 static float zoomFactor=1.0;
 GLdouble move_x=5.0,
 	move_y=5.0,
-	move_z=0;
+	move_z=0,
+	max_angle = 70.0,
+	min_angle = 0;
 
 const int window_width = 800,
 	window_height = 600;
+
+
 
 GLint midWindowX = window_width  / 2;         // Middle of the window horizontally
 GLint midWindowY = window_height / 2;         // Middle of the window vertically
@@ -46,12 +50,16 @@ GLfloat camXSpeed = 0.0f;
 GLfloat camYSpeed = 0.0f;
 GLfloat camZSpeed = 0.0f;
 
+GLfloat fireAngle = 0.0f;
+
 // Hoding any keys down?
 bool holdingForward     = false;
 bool holdingBackward    = false;
 bool holdingLeftStrafe  = false;
 bool holdingRightStrafe = false;
 bool firetheballista	= false;
+bool holdingUPARROW		= false;
+bool holdingDOWNARROW	= false;
 double pushtime			= 0;
 
 
@@ -90,7 +98,7 @@ void setViewMatrix ()
 
 void calculate_Arrow(double current_time)
 {
-
+	
 	double time = current_time - pushtime;
 	double timeOfFlight = getTimeOfFlight();
 
@@ -303,6 +311,25 @@ void Move_Camera()
     glTranslatef(-getCamXpos(),-getCamYpos(),-getCamZpos());    // Translate the modelviewm matrix to the position of our camera
 }
 
+void calculate_BallistaAngle()
+{
+	if(holdingDOWNARROW == true && fireAngle > min_angle)
+	{
+		fireAngle -= 1.0;
+		cout << fireAngle<<endl;
+
+	}
+	if(holdingUPARROW == true && fireAngle < max_angle)
+	{
+		fireAngle += 1.0;
+		cout << fireAngle<<endl;
+	}
+}
+
+GLfloat getBallistaAngle()
+{
+	return fireAngle;
+}
 
 // Function to convert degrees to radians
 float toRads(const float &theAngleInDegrees)
@@ -333,12 +360,22 @@ void handleKeypress(int theKey, int theAction)
  
         case 'D':
             holdingRightStrafe = true;
-            break;
+			break;
 
 		case 'F':
 			firetheballista = true;
 			pushtime = glfwGetTime();
+			Arrowpos();
 			break;
+
+		case 'P':
+			holdingUPARROW = true;
+			break;
+
+		case 'O':
+			holdingDOWNARROW = true;
+			break;
+
  
         default:
             // Do nothing...
@@ -364,6 +401,16 @@ void handleKeypress(int theKey, int theAction)
         case 'D':
             holdingRightStrafe = false;
             break;
+
+			
+		case 'P':
+			holdingUPARROW = false;
+			break;
+
+		case 'O':
+			holdingDOWNARROW = false;
+			break;
+
  
         default:
             // Do nothing...

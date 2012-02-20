@@ -55,8 +55,8 @@ int LoadGLTextures()
 
 int main(void)
 {
-	setFireAngle();
-	Arrowpos();
+	//setFireAngle();
+	//Arrowpos();
 	Init();
 	LoadGLTextures();
 	Main_Loop();
@@ -155,6 +155,11 @@ void Main_Loop(void)
 
 	// Calculate our camera movement
 	calculateCameraMovement();
+
+	calculate_BallistaAngle();
+	
+
+	setFireAngle(getBallistaAngle());
 
 	// Move our camera
 	moveCamera();
