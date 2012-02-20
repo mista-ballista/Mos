@@ -16,7 +16,7 @@ void Draw(void);
 
 using namespace std;
 
-string objname = "Data/Ballista.obj";
+string objname = "Data/bigArrow.obj";
 char texname[] = "Data/johda2.tga";
 
 int frames = 0;
@@ -55,8 +55,6 @@ int LoadGLTextures()
 
 int main(void)
 {
-	//setFireAngle();
-	//Arrowpos();
 	Init();
 	LoadGLTextures();
 	Main_Loop();
@@ -159,7 +157,7 @@ void Main_Loop(void)
 	calculate_BallistaAngle();
 	
 
-	setFireAngle(getBallistaAngle());
+	setFireAngle(getFireAngle());
 
 	// Move our camera
 	moveCamera();
@@ -262,17 +260,16 @@ void Draw(void)
 
 	Move_Camera();
 
-
-
 	Draw_3DSquare();
 
 	glPushMatrix();
 
-	//glTranslatef(0.0f, 5.0f, 0.0f);
+
+	rotateBallista();
 
 	MOVE_ARROW();
 
-	Draw_3DSquare();
+	DrawScene();
 
 	glPopMatrix();
 

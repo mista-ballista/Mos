@@ -10,7 +10,6 @@ float getArrowposX(float time);
 float getArrowposY(float time);
 double getTimeOfFlight();
 void setFireAngle(float _tempVinkel);
-double getFireAngle();
 
 
 #endif
