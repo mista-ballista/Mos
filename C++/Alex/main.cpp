@@ -159,7 +159,7 @@ void Main_Loop(void)
 	calculate_BallistaAngle();
 	
 
-	setFireAngle(getBallistaAngle());
+	setFireAngle(getFireAngle());
 
 	// Move our camera
 	moveCamera();
@@ -268,7 +268,8 @@ void Draw(void)
 
 	glPushMatrix();
 
-	//glTranslatef(0.0f, 5.0f, 0.0f);
+
+	rotateBallista();
 
 	MOVE_ARROW();
 

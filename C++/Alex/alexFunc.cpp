@@ -51,6 +51,7 @@ GLfloat camYSpeed = 0.0f;
 GLfloat camZSpeed = 0.0f;
 
 GLfloat fireAngle = 0.0f;
+GLfloat ballistaAngle = 0.0f;
 
 // Hoding any keys down?
 bool holdingForward     = false;
@@ -60,6 +61,8 @@ bool holdingRightStrafe = false;
 bool firetheballista	= false;
 bool holdingUPARROW		= false;
 bool holdingDOWNARROW	= false;
+bool holdingLEFTARROW	= false;
+bool holdingRIGHTARROW	= false;
 double pushtime			= 0;
 
 
@@ -108,6 +111,10 @@ void calculate_Arrow(double current_time)
 		translateX = getArrowposX(time);
 		translateY = getArrowposY(time);
 	}
+	else
+	{
+		firetheballista = false;
+	}
 
 }
 
@@ -115,7 +122,8 @@ void calculate_Arrow(double current_time)
 
 void MOVE_ARROW()
 {
-	 glTranslatef(getArrowXpos(),getArrowYpos(),0);    
+	 glTranslatef(getArrowXpos(),getArrowYpos(),0);  
+
 }
 
 GLfloat getArrowXpos()
@@ -324,13 +332,32 @@ void calculate_BallistaAngle()
 		fireAngle += 1.0;
 		cout << fireAngle<<endl;
 	}
+	if(holdingLEFTARROW == true && firetheballista == false)
+	{
+		ballistaAngle -= 1.0;
+	}
+	if(holdingRIGHTARROW == true && firetheballista == false)
+	{
+		ballistaAngle += 1.0;
+	}
+
+
 }
 
-GLfloat getBallistaAngle()
+void rotateBallista()
+{
+	glRotatef(getBallistaAngle(), 0,1,0);
+}
+
+GLfloat getFireAngle()
 {
 	return fireAngle;
 }
 
+GLfloat getBallistaAngle()
+{
+	return ballistaAngle;
+}
 // Function to convert degrees to radians
 float toRads(const float &theAngleInDegrees)
 {
@@ -376,6 +403,13 @@ void handleKeypress(int theKey, int theAction)
 			holdingDOWNARROW = true;
 			break;
 
+		case GLFW_KEY_LEFT:
+			holdingLEFTARROW = true;
+			break;
+
+		case GLFW_KEY_RIGHT:
+			holdingRIGHTARROW = true;
+			break;
  
         default:
             // Do nothing...
@@ -411,6 +445,14 @@ void handleKeypress(int theKey, int theAction)
 			holdingDOWNARROW = false;
 			break;
 
+		case GLFW_KEY_LEFT:
+			holdingLEFTARROW = false;
+			break;
+
+		case GLFW_KEY_RIGHT:
+			holdingRIGHTARROW = false;
+			break;
+
  
         default:
             // Do nothing...
@@ -418,7 +460,10 @@ void handleKeypress(int theKey, int theAction)
         }
     }
 }
-
+bool Fired()
+{
+	return firetheballista;
+}
 GLfloat getCamXpos()
 {
 	return camXPos;

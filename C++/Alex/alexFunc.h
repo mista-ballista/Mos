@@ -21,7 +21,10 @@ void handleKeypress(int theKey, int theAction);
 void Move_Camera();
 void calculate_Arrow(double current_time);
 void calculate_BallistaAngle();
+void rotateBallista();
 GLfloat getBallistaAngle();
+GLfloat getFireAngle();
+bool Fired();
 
 GLfloat getCamXpos();
 GLfloat getCamYpos();
