@@ -368,11 +368,11 @@ void handleKeypress(int theKey, int theAction)
 			Arrowpos();
 			break;
 
-		case 'P':
+		case GLFW_KEY_UP:
 			holdingUPARROW = true;
 			break;
 
-		case 'O':
+		case GLFW_KEY_DOWN:
 			holdingDOWNARROW = true;
 			break;
 
@@ -403,11 +403,11 @@ void handleKeypress(int theKey, int theAction)
             break;
 
 			
-		case 'P':
+		case GLFW_KEY_UP:
 			holdingUPARROW = false;
 			break;
 
-		case 'O':
+		case GLFW_KEY_DOWN:
 			holdingDOWNARROW = false;
 			break;
 
