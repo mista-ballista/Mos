@@ -16,7 +16,7 @@ void Draw(void);
 
 using namespace std;
 
-string objname = "Data/bigArrow.obj";
+string objname = "Data/Ballista.obj";
 char texname[] = "Data/johda2.tga";
 
 int frames = 0;
@@ -29,7 +29,7 @@ GLuint	texture[1];
 vector<GLfloat> vertices;
 vector<GLfloat> texcoords;
 vector<GLfloat> normals;
-vector<GLubyte> indices;
+vector<GLuint> indices;
 
 int LoadGLTextures()
 {
@@ -180,7 +180,8 @@ void DrawScene ()
 	glTexCoordPointer(3, GL_FLOAT, 0, texcoords.data());
 	glVertexPointer(3, GL_FLOAT, 0, vertices.data());
 
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_BYTE, indices.data());
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
+	//glDrawArrays(GL_TRIANGLES, 0, (vertices.size()));
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -267,6 +268,7 @@ void Draw(void)
 
 	rotateBallista();
 
+
 	MOVE_ARROW();
 
 	DrawScene();
@@ -276,12 +278,6 @@ void Draw(void)
 	glTranslatef(0.0f, -5.0f, 0.0f);
 
 	Draw_3DSquare();
-	
-	glPopMatrix();
-	
-	glTranslatef(5.0f, 5.0f, 0.0f);
-
-	DrawScene();
 
 	glPopMatrix();
 
