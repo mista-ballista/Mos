@@ -55,6 +55,7 @@ int LoadGLTextures()
 
 int main(void)
 {
+	setFireAngle();
 	Arrowpos();
 	Init();
 	LoadGLTextures();

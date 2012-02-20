@@ -9,6 +9,8 @@ void Arrowpos();
 float getArrowposX(float time);
 float getArrowposY(float time);
 double getTimeOfFlight();
+void setFireAngle();
+double getFireAngle();
 
 
 #endif

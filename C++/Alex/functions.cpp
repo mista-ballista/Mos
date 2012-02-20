@@ -7,6 +7,7 @@ using namespace std;
 
 const float Pi = 3.1415926535897932384626433832795f;
 const float _theta0 = 0.3491f;
+const float TO_RADS = 3.141592654f / 180.0f;
 
 float value=0;
 float dx;
@@ -45,6 +46,16 @@ float _steglangd = 0.001f;
 
 
 
+void setFireAngle()
+{
+	cout << "Avfyrningsvinkel i grader?" <<  endl;
+	cin >> _vinkel; 
+	_vinkel = _vinkel*TO_RADS;
+}
+double getFireAngle()
+{
+	return _vinkel;
+}
 
 float  rsum(float a,float b,int n)
 {
@@ -103,15 +114,16 @@ float force(float _drawLength)
 
 void Arrowpos()
 {
-	_l = 0.5f; /*Lemmarnas längd*/
-	_mArrow = 0.025f; /*Massan på pilen*/
-	_x0 = _l*sin(_theta0); /*Stränghöjd i startläge*/
-	g = 9.82f; /*gravitation*/
-	_vinkel= (45.0f*Pi/180.0f); /*utgångsvinkel*/
-	_BallistaHeight = 1.0f; /*Start höjd*/
-	_totalDrag = 0.7f;
-	_pullBack = _totalDrag-_x0; /*Hur långt vi drar pilen*/
-	_work = rsum(_pullBack,_x0,600); /*Pilens utgångshastighet när tilen dras tillbaka*/
+	_l				= 0.5f; /*Lemmarnas längd*/
+	_mArrow			= 0.025f; /*Massan på pilen*/
+	_x0				= _l*sin(_theta0); /*Stränghöjd i startläge*/
+	g				= 9.82f; /*gravitation*/
+	//_vinkel= (45.0f*Pi/180.0f); /*utgångsvinkel*/
+	_vinkel			=getFireAngle();
+	_BallistaHeight	= 1.0f; /*Start höjd*/
+	_totalDrag		= 0.7f;
+	_pullBack		= _totalDrag-_x0; /*Hur långt vi drar pilen*/
+	_work			= rsum(_pullBack,_x0,600); /*Pilens utgångshastighet när tilen dras tillbaka*/
 	
 
 	v = sqrt(2*-_work/_mArrow);
