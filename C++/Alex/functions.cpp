@@ -8,6 +8,7 @@ using namespace std;
 const float Pi = 3.1415926535897932384626433832795f;
 const float _theta0 = 0.3491f;
 const float TO_RADS = 3.141592654f / 180.0f;
+const float TO_DEG =  180.0f/3.141592654f;
 
 float value=0;
 float dx;
@@ -42,21 +43,39 @@ vector<float> t;
 vector<float> x;
 vector<float> yv;
 vector<float> y;
+vector<float> _vArrowAngle;
 float _steglangd = 0.001f;
+int old_index = 0.0;
 
 
 
 void setFireAngle(float _tempVinkel)
 {
-	//cout << "Avfyrningsvinkel i grader?" <<  endl;
-	//cin >> _vinkel; 
-
 	_vinkel = _tempVinkel*TO_RADS;
 
 }
 double getFireAngle()
 {
 	return _vinkel;
+}
+
+float getarrowAngle(float time)
+{
+
+	float angle;
+	int index = time / _steglangd;
+	if(index < y.size())
+	{
+	 angle = _vinkel*TO_DEG - (y.at(index)-y.at(old_index)/(x.at(index)-x.at(old_index)));
+	}
+	else
+	{
+		 angle = -_vinkel*TO_DEG;
+	}
+	return angle;
+
+	old_index= index;
+
 }
 
 float  rsum(float a,float b,int n)
@@ -121,11 +140,9 @@ void Arrowpos()
 	y.clear();
 	yv.clear();
 	t.clear();
+	_vArrowAngle.clear();
 	_timeOfFlight = 0;
 
-	bool test = x.empty();
-
-	cout << test << endl;
 	_l				= 0.5f; /*Lemmarnas längd*/
 	_mArrow			= 0.025f; /*Massan på pilen*/
 	_x0				= _l*sin(_theta0); /*Stränghöjd i startläge*/
@@ -146,27 +163,31 @@ void Arrowpos()
 	_totalDistance = (v*cos(_vinkel)/g)*(v*sin(_vinkel)+sqrt(temp+2*g*_BallistaHeight));
 
 	//hastighet i x led
-	 
+
 	_timeOfFlight = (v*sin(_vinkel)+sqrt((temp + 2*g*_BallistaHeight)))/g; /*hur lång tid som pilen är i luften*/
 	//t = [0:0.0001:_timeOfFlight];
 	int index = 0;
-	
+	float deltaX=0.0f;
+	float deltaY = 0.0f;
+	float test1 = 0.0f;
+
 	for (float i=0.0f; i<_timeOfFlight; i+=_steglangd)
 	{
+
+		float xkoord,
+			ykoord;
 		t.push_back(i);	
-		x.push_back(t[index]*xv); /*% X kord för pil*/
+
+		xkoord = t[index]*xv;
+		x.push_back(xkoord); /*% X kord för pil*/
 		yv.push_back(v*sin(_vinkel)-(g*x[index])/(v*cos(_vinkel)));// Hastighet i y led
-		y.push_back(_BallistaHeight+x[index]*tan(_vinkel)-(g*pow(x[index],2))/(2*temp2));// Y kord för pil
+		ykoord = _BallistaHeight+x[index]*tan(_vinkel)-(g*pow(x[index],2))/(2*temp2);
+		y.push_back(ykoord);// Y kord för pil
+
 		index++;		
-		
 	}	
 
-	// Hastighet vid X
-	//// vabs = sqrt(v^2-2*g*x.*tand(vinkel)+((g*x)/(v*cosd(vinkel))^2));
-	//cout << xv << endl;
-	//cout << v << endl;
-	test = x.empty();
-	cout << test << endl;
+
 	cout << "TotalDistance: "<< _totalDistance << endl;
 	cout << "Time of flight: "<< _timeOfFlight << endl;
 }
@@ -186,7 +207,6 @@ float getArrowposX(float time)
 	return xpos;
 	
 }
-
 float getArrowposY(float time)
 {	float ypos;
 	int index = time / _steglangd;

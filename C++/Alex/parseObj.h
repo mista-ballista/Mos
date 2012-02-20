@@ -17,4 +17,4 @@ void parseObj(	string filename,
 				vector<GLfloat> &vertices, 
 				vector<GLfloat> &texcoords, 
 				vector<GLfloat> &normals, 
-				vector<GLubyte> &indices);
+				vector<GLuint> &indices);

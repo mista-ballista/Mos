@@ -23,11 +23,12 @@ GLint midWindowY = window_height / 2;         // Middle of the window vertically
 
 GLfloat translateX = 0.0f;
 GLfloat translateY= 0.0f;
+GLfloat arrowAngle = 0.0f;
 
 
 GLfloat fieldOfView = 45.0f;                 // Define our field of view (i.e. how quickly foreshortening occurs)
 GLfloat near        = 1.0f;                  // The near (Z Axis) point of our viewing frustrum (default 1.0f)
-GLfloat far         = 1500.0f;               // The far  (Z Axis) point of our viewing frustrum (default 1500.0f)
+GLfloat far         = 1500.0f;				// The far  (Z Axis) point of our viewing frustrum (default 1500.0f)
 
 GLfloat movementSpeedFactor = 1.0f;
 
@@ -52,6 +53,7 @@ GLfloat camZSpeed = 0.0f;
 
 GLfloat fireAngle = 0.0f;
 GLfloat ballistaAngle = 0.0f;
+GLfloat temp =0.0f;
 
 // Hoding any keys down?
 bool holdingForward     = false;
@@ -107,7 +109,7 @@ void calculate_Arrow(double current_time)
 
 	if(firetheballista==true && time < timeOfFlight)
 	{
-
+		arrowAngle = getarrowAngle(time);
 		translateX = getArrowposX(time);
 		translateY = getArrowposY(time);
 	}
@@ -118,12 +120,34 @@ void calculate_Arrow(double current_time)
 
 }
 
+GLfloat getArrowRotation()
+{
 
+	if(firetheballista == false) 
+	{
+		//GLfloat temp = getFireAngle();
+		return getFireAngle();
+	}
+
+		return getArrowAngle();
+
+
+}
 
 void MOVE_ARROW()
-{
-	 glTranslatef(getArrowXpos(),getArrowYpos(),0);  
+{		
+	glTranslatef(getArrowXpos(),getArrowYpos(),0);  
+	
+	if(firetheballista == true)
+	{
+		glRotatef(getArrowRotation(),0,0,1);
+	}
+}
 
+
+GLfloat getArrowAngle()
+{
+	return arrowAngle;
 }
 
 GLfloat getArrowXpos()
@@ -409,6 +433,9 @@ void handleKeypress(int theKey, int theAction)
 
 		case GLFW_KEY_RIGHT:
 			holdingRIGHTARROW = true;
+			break;
+		case GLFW_KEY_ESC:
+			exit(0);
 			break;
  
         default:

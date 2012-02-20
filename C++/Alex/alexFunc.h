@@ -24,6 +24,8 @@ void calculate_BallistaAngle();
 void rotateBallista();
 GLfloat getBallistaAngle();
 GLfloat getFireAngle();
+GLfloat getArrowRotation();
+GLfloat getArrowAngle();
 bool Fired();
 
 GLfloat getCamXpos();

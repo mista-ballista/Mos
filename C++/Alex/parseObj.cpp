@@ -31,7 +31,7 @@ void parseObj(	string filename,
 				vector<GLfloat> &vertices, 
 				vector<GLfloat> &texcoords, 
 				vector<GLfloat> &normals, 
-				vector<GLubyte> &indices) 
+				vector<GLuint> &indices) 
 {
 	ifstream inFile;
 	inFile.open(filename.c_str());
@@ -171,7 +171,6 @@ void parseObj(	string filename,
 					sub[0] = str.substr(facePosition[0], facePosition[1]-facePosition[0]).c_str();
 					sub[1] = str.substr(facePosition[1], facePosition[2]-facePosition[1]).c_str();
 					sub[2] = str.substr(facePosition[2], str.find('f') - facePosition[2]).c_str();
-					//sub[3] = str.substr(facePosition[3], str.find('f') - facePosition[3]).c_str();
 
 					stringstream ss (stringstream::in | stringstream::out);
 
@@ -192,13 +191,6 @@ void parseObj(	string filename,
 					fVert.push_back(v);
 					fTex.push_back(uv);
 					fNorm.push_back(n);
-
-					//ss << sub[3];
-					//ss >> v >> uv >> n;
-					//fVert.push_back(v);
-					//fTex.push_back(uv);
-					//fNorm.push_back(n);
-
 					
 			}
 
@@ -213,60 +205,34 @@ void parseObj(	string filename,
 	// MAKE ARRAYS ----------------------------------------//
 
 
-	
-	//vertices	= *new GLfloat[vertexVec.size()];
-	//normals		= *new GLfloat[fNorm.size()];
-	//texcoords	= *new GLfloat[fTex.size()];
-	//indices		= *new GLubyte[fVert.size()];
-
-	//vertices = vertexVec;
-
 	for (int i = 0; i < vertexVec.size(); i++)
 	{
 		vertices.push_back(vertexVec[i]);
-		//cout << vertices[i] << " ";
 	}
-	//cout << endl;
+
 
 	for (int i = 0; i < fTex.size(); i++)
 	{
 		texcoords.push_back(textureVec[ (fTex[i]-1)*3 ]);
 		texcoords.push_back(textureVec[ (fTex[i]-1)*3 + 1]);
 		texcoords.push_back(textureVec[ (fTex[i]-1)*3 + 2]);
-		//cout << texcoords[i] << " ";
 	}
-	//cout << endl;
 
-	for (int i = 0; i < fNorm.size(); i+=3)
+	
+
+	for (int i = 0; i < fNorm.size(); i++)
 	{
 		normals.push_back(normalVec[ (fNorm[i]-1)*3 ]);
 		normals.push_back(normalVec[ (fNorm[i]-1)*3 + 1]);
 		normals.push_back(normalVec[ (fNorm[i]-1)*3 + 2]);
-		//cout << normals[i] << " ";
 	}
-	//cout << endl;
+
 
 	for (int i = 0; i < fVert.size(); i++)
 	{
 		indices.push_back(fVert[i]-1);
-		//cout << (int)indices[i] << " ";
 	}
 
-	
-	//cout << endl << "---------------------------------" << endl;
+
 	
 }
-
-
-//int main(void)
-//{
-//	vector<GLfloat> vertices;
-//	vector<GLfloat> texcoords;
-//	vector<GLfloat> normals;
-//	vector<GLubyte> indices;
-//
-//	string filename = "kub2.obj";
-//	parseObj(filename, vertices, texcoords, normals, indices);
-//
-//	system("pause");
-//}
