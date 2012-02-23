@@ -325,8 +325,8 @@ void DrawMap()
 {
 
 	
-	float scale = 10.0f / max(_terrain->width() - 1, _terrain->length() - 1);
-	//glScalef(scale, scale, scale);
+	float scale = 100.0f / max(_terrain->width() - 1, _terrain->length() - 1);
+	glScalef(scale, scale, scale);
 	glTranslatef(-(float)(_terrain->width() - 1) / 2,
 				 0.0f,
 				 -(float)(_terrain->length() - 1) / 2);
@@ -444,7 +444,29 @@ void Draw(void)
 
 	Move_Camera();
 
+
+	//Avkommentera detta när HCs klass fungerar!
+	////Scengraf
+
+	////Terräng
+	//glPushMatrix();
 	//DrawMap();
+
+	//	//Ballista
+	//	glPushMatrix();
+	//	//Ballista.Draw();
+
+	//		//Arrow
+	//		glPushMatrix();
+	//		//Arrow.Draw();
+	//		glPopMatrix();
+	//	glPopMatrix();
+
+	//	//Borg
+	//	glPushMatrix();
+	//	//Borg.Draw();
+	//	glPopMatrix();
+	//glPopMatrix();
 
 	glPushMatrix();
 
