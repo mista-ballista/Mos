@@ -42,16 +42,19 @@ Object objBallista(strBallista);
 Object objBorg(strBorg);
 
 int frames = 0;
+float roll;
 double t0 = 0.0;
 char titlestring[200];
 double current_time = 0.0;
 
 GLuint	texture[1];
+GLuint _testTexure[1];
  
 vector<GLfloat> vertices;
 vector<GLfloat> texcoords;
 vector<GLfloat> normals;
 vector<GLuint> indices;
+
 
 
 //Loads a terrain from a heightmap.  The heights of the terrain range from
@@ -141,6 +144,7 @@ Terrain* _terrain;
 BITMAPINFOHEADER	landInfo;
 unsigned char*       landTexture;
 unsigned int		   land;
+GLUquadric *myQuad;
 
 
 void cleanup() {
@@ -169,10 +173,26 @@ int LoadGLTextures()
 	return true;
 }
 
+void testLoad()
+{	
+
+	myQuad=gluNewQuadric();
+	_testTexure[0] = SOIL_load_OGL_texture
+		(
+		texname,
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_INVERT_Y
+		);
+
+	if(_testTexure[0]  == 0)
+		Shut_Down(1);
+}
+
 bool LoadTextures()
 {
 	// load the land texture data
-	landTexture = LoadBitmapFile("Terrain2.bmp", &landInfo);
+	landTexture = LoadBitmapFile("Data/green.bmp", &landInfo);
 	if (!landTexture)
 		return false;
 
@@ -201,6 +221,7 @@ void initRendering() {
 int main(void)
 {
 	Init();
+	testLoad();
 	//LoadGLTextures();
 	Main_Loop();
 	Shut_Down(0);
@@ -246,7 +267,7 @@ void Init(void)
 
 	LIGHT();
 
-	initRendering();
+	//initRendering();
 	_terrain = loadTerrain("Data/heightmap2.bmp", 20);
 
   	glEnable(GL_TEXTURE_2D);							// Enable Texture Mapping ( NEW )
@@ -433,11 +454,37 @@ void Draw_3DSquare()
 
 }
 
+
+void SkyBox()
+{
+
+	glDisable(GL_DEPTH);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(1,1,1,1);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, _testTexure[0]);
+	glTranslatef(0,0,0);
+	glRotatef(90,1,0,1);
+	gluSphere(myQuad,500,200,200);
+	glRotatef(roll/10, 0.2, 1, 0);
+	glColor4f(1, 1, 1, cos(roll/12));
+	gluSphere(myQuad, 500-0.8, 200, 200);
+	glEnable(GL_DEPTH);
+	glDisable(GL_BLEND);
+	glEnable(GL_LIGHTING);
+	roll+=0.002f;
+
+}
  
 void Draw(void)
 {
+
+
 	 // Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 	
     // Reset the matrix
     glMatrixMode(GL_MODELVIEW);
@@ -451,8 +498,12 @@ void Draw(void)
 
 	glPushMatrix();
 
+	glPushMatrix();
+		SkyBox();
+		glPopMatrix();
 		//Ballista
 		glPushMatrix();	
+
 			//Matrismultiplikationer som rör Ballistan här!
 			glColor3f(1.0f, 0.0f, 0.0f);
 
