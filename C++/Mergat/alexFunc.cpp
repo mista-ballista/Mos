@@ -73,10 +73,7 @@ double pushtime			= 0;
 
 void setProjectionMatrix ()
 {
-	//glMatrixMode(GL_PROJECTION);
-	//glLoadIdentity();
-	//float aspect_ratio = ((float)window_height) / window_width;
-	//glFrustum(.5, -.5, -.5 * aspect_ratio, .5 * aspect_ratio, 1, 50);
+
 	
 	
 	glMatrixMode(GL_PROJECTION);
@@ -123,14 +120,7 @@ void calculate_Arrow(double current_time)
 GLfloat getArrowRotation()
 {
 
-	if(firetheballista == false) 
-	{
-		//GLfloat temp = getFireAngle();
-		return getFireAngle();
-	}
-
 		return getArrowAngle();
-
 
 }
 
@@ -138,10 +128,8 @@ void MOVE_ARROW()
 {		
 	glTranslatef(getArrowXpos(),getArrowYpos(),0);  
 	
-	if(firetheballista == true)
-	{
 		glRotatef(getArrowRotation(),0,0,1);
-	}
+
 }
 
 
@@ -173,7 +161,6 @@ void handleMouseMove(int mouseX, int mouseY)
     GLfloat vertMouseSensitivity  = 10.0f;
     GLfloat horizMouseSensitivity = 10.0f;
  
-    //cout << "Mouse cursor is at position (" << mouseX << ", " << mouseY << endl;
  
     int horizMovement = mouseX - midWindowX;
     int vertMovement  = mouseY - midWindowY;
@@ -415,6 +402,7 @@ void handleKeypress(int theKey, int theAction)
 
 		case 'F':
 			firetheballista = true;
+			ResetIndex();
 			pushtime = glfwGetTime();
 			Arrowpos();
 			break;

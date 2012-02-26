@@ -49,6 +49,11 @@ int old_index = 0.0;
 
 
 
+void ResetIndex()
+{
+	old_index = 0.0;
+}
+
 void setFireAngle(float _tempVinkel)
 {
 	_vinkel = _tempVinkel*TO_RADS;
@@ -66,15 +71,13 @@ float getarrowAngle(float time)
 	int index = time / _steglangd;
 	if(index < y.size())
 	{
-	 angle = _vinkel*TO_DEG - (y.at(index)-y.at(old_index)/(x.at(index)-x.at(old_index)));
+	 angle = ((y.at(index)-y.at(old_index))/(x.at(index)-x.at(old_index)))*TO_DEG;
 	}
-	else
-	{
-		 angle = -_vinkel*TO_DEG;
-	}
-	return angle;
 
 	old_index= index;
+	return angle;
+
+
 
 }
 

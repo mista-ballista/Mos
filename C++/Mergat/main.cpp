@@ -258,12 +258,11 @@ void Init(void)
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 
-    //glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
+    glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
  
     glLineWidth(2.0f);			// Set a 'chunky' line width
 
-	// Ladda in objekt
-	//parseObj(objname, vertices, texcoords, normals, indices);
+
 
 
 }
@@ -456,18 +455,17 @@ void Draw(void)
 		glPushMatrix();	
 			//Matrismultiplikationer som rör Ballistan här!
 			glColor3f(1.0f, 0.0f, 0.0f);
-			glRotatef(0.0f, 0.0f, 1.0f, 0.0f);
+
+			rotateBallista();
 			glTranslatef(0.0f, 0.0f, 0.0f);
 			glScalef(0.2f, 0.2f, 0.2f);
-			rotateBallista();
 			objBallista.DrawObject();
 		
 			//Arrow
 			glPushMatrix();		
 				//Matrismultiplikationer som rör Pilen här!
-				glRotatef(90.0f,0.0f,1.0f,0.0f);
+				glRotatef(90.0 , 0.0f, 1.0f, 0.0f);
 				MOVE_ARROW();
-				glTranslatef(0.0f, 0.0f, 0.0f);		
 				objArrow.DrawObject();			
 			glPopMatrix();
 		glPopMatrix();
