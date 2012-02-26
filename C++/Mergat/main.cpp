@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <SOIL.h>
 #include <vector>
-#include "parseObj.h"
 #include <cmath>
 #include <stdio.h>
 #include "alexFunc.h"
@@ -457,14 +456,16 @@ void Draw(void)
 		glPushMatrix();	
 			//Matrismultiplikationer som rör Ballistan här!
 			glColor3f(1.0f, 0.0f, 0.0f);
-			glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+			glRotatef(0.0f, 0.0f, 1.0f, 0.0f);
 			glTranslatef(0.0f, 0.0f, 0.0f);
 			glScalef(0.2f, 0.2f, 0.2f);
+			rotateBallista();
 			objBallista.DrawObject();
 		
 			//Arrow
 			glPushMatrix();		
 				//Matrismultiplikationer som rör Pilen här!
+				glRotatef(90.0f,0.0f,1.0f,0.0f);
 				MOVE_ARROW();
 				glTranslatef(0.0f, 0.0f, 0.0f);		
 				objArrow.DrawObject();			

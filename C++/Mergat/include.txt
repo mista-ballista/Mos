@@ -1,0 +1,5 @@
+opengl32.lib
+GLFW.lib
+GLFWDLL.lib
+glu32.lib
+SOIL.lib

@@ -6,11 +6,11 @@
 #include <stdlib.h>
 #include <SOIL.h>
 #include <vector>
-#include "parseObj.h"
 #include <cmath>
 #include <stdio.h>
 #include "alexFunc.h"
 #include "functions.h"
+#include "Object.h"
 
 
 /////////
@@ -28,11 +28,18 @@ void Shut_Down(int return_code);
 void Main_Loop(void);
 void Draw_Square(float red, float green, float blue);
 void Draw(void);
+void LIGHT(void);
 
 using namespace std;
 
-string objname = "Data/bigArrow.obj";
-char texname[] = "Data/johda2.tga";
+string strArrow = "Data\bigArrow.obj";
+string strBallista = "Data\ballista.obj";
+string strBorg = "Data\Borg.obj";
+char texname[] = "Data\johda2.tga";
+
+Object objArrow(strArrow);
+Object objBallista(strBallista);
+Object objBorg(strBorg);
 
 int frames = 0;
 double t0 = 0.0;
@@ -46,9 +53,6 @@ vector<GLfloat> texcoords;
 vector<GLfloat> normals;
 vector<GLuint> indices;
 
-
-
-////////////////////
 
 //Loads a terrain from a heightmap.  The heights of the terrain range from
 //-height / 2 to height / 2.
@@ -190,14 +194,14 @@ void initRendering() {
 	glEnable(GL_NORMALIZE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_TEXTURE_2D);
-	LoadTextures();
+	//LoadTextures();
 }
 
 
 int main(void)
 {
 	Init();
-	LoadGLTextures();
+	//LoadGLTextures();
 	Main_Loop();
 	Shut_Down(0);
 }
@@ -240,8 +244,10 @@ void Init(void)
 	setProjectionMatrix ();
 	setViewMatrix();
 
+	LIGHT();
+
 	initRendering();
-	_terrain = loadTerrain("heightmap.bmp", 20);
+	_terrain = loadTerrain("Data/heightmap2.bmp", 20);
 
   	glEnable(GL_TEXTURE_2D);							// Enable Texture Mapping ( NEW )
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
@@ -257,7 +263,7 @@ void Init(void)
     glLineWidth(2.0f);			// Set a 'chunky' line width
 
 	// Ladda in objekt
-	parseObj(objname, vertices, texcoords, normals, indices);
+	//parseObj(objname, vertices, texcoords, normals, indices);
 
 
 }
@@ -313,11 +319,11 @@ void Main_Loop(void)
 
 void LIGHT()
 {
-	GLfloat ambientColor[] = {0.4f, 0.4f, 0.4f, 1.0f};
+	GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
 	
 	GLfloat lightColor0[] = {0.6f, 0.6f, 0.6f, 1.0f};
-	GLfloat lightPos0[] = {-0.5f, 20.8f, 0.1f, 0.0f};
+	GLfloat lightPos0[] = {-0.0f, 20.0f, 0.1f, 0.0f};
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
 }
@@ -325,7 +331,7 @@ void DrawMap()
 {
 
 	
-	float scale = 100.0f / max(_terrain->width() - 1, _terrain->length() - 1);
+	float scale = 200.0f / max(_terrain->width() - 1, _terrain->length() - 1);
 	glScalef(scale, scale, scale);
 	glTranslatef(-(float)(_terrain->width() - 1) / 2,
 				 0.0f,
@@ -431,62 +437,57 @@ void Draw_3DSquare()
  
 void Draw(void)
 {
-
-	/*DrawScene();*/
-
 	 // Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	LIGHT();
+	
     // Reset the matrix
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
- 
+    glLoadIdentity(); 
 
 	Move_Camera();
 
 
-	//Avkommentera detta när HCs klass fungerar!
-	////Scengraf
-
-	////Terräng
-	//glPushMatrix();
-	//DrawMap();
-
-	//	//Ballista
-	//	glPushMatrix();
-	//	//Ballista.Draw();
-
-	//		//Arrow
-	//		glPushMatrix();
-	//		//Arrow.Draw();
-	//		glPopMatrix();
-	//	glPopMatrix();
-
-	//	//Borg
-	//	glPushMatrix();
-	//	//Borg.Draw();
-	//	glPopMatrix();
-	//glPopMatrix();
+		
+	//Scengraf
 
 	glPushMatrix();
 
-	rotateBallista();
+		//Ballista
+		glPushMatrix();	
+			//Matrismultiplikationer som rör Ballistan här!
+			glColor3f(1.0f, 0.0f, 0.0f);
+			glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+			glTranslatef(0.0f, 0.0f, 0.0f);
+			glScalef(0.2f, 0.2f, 0.2f);
+			objBallista.DrawObject();
+		
+			//Arrow
+			glPushMatrix();		
+				//Matrismultiplikationer som rör Pilen här!
+				MOVE_ARROW();
+				glTranslatef(0.0f, 0.0f, 0.0f);		
+				objArrow.DrawObject();			
+			glPopMatrix();
+		glPopMatrix();
+		
+		//Borg	
+		glPushMatrix();
+			//Matrismultiplikationer som rör Borgen här!	
+			glColor3f(0.0f, 0.0f, 1.0f);
+			glTranslatef(0.0f, 0.0f, 50.0f);
+			glScalef(5.0f, 5.0f, 5.0f);
+			glRotatef(0.0f, 0.0f, 1.0f, 0.0f);		
+			objBorg.DrawObject();		
+		glPopMatrix();
 
-	MOVE_ARROW();
 
-	DrawScene();
-
+		//Terräng och "markplan"
+		//Matrismultiplikationer som rör Heightmap här!	
+		glColor3f(0.0f, 1.0f, 0.0f);
+		glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
+		DrawMap();
+		drawGround();
 	glPopMatrix();
-
-	glTranslatef(0.0f, -5.0f, 0.0f);
-
-	DrawMap();
-
-	glPopMatrix();
-
-	drawGround();
-
-
  
     // ----- Stop Drawing Stuff! ------
  

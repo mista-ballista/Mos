@@ -1,9 +1,9 @@
 #include "alexFunc.h"
 #include "functions.h"
-#include "parseObj.h"
 #include <SOIL.h>
+#include <iostream>
 
-
+using namespace std;
 const float TO_RADS = 3.141592654f / 180.0f;
 
 static float zoomFactor=1.0;
