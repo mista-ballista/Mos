@@ -10,7 +10,7 @@ static float zoomFactor=1.0;
 GLdouble move_x=5.0,
 	move_y=5.0,
 	move_z=0,
-	max_angle = 70.0,
+	max_angle = 50.0,
 	min_angle = 0;
 
 const int window_width = 800,

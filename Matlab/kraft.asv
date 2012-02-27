@@ -4,17 +4,12 @@ function [ F ] = kraft( draglangd )
 
 
 
-% L = 0.5; %Lemmarnas längd
-% Y0 = 0.1; %Längd på handtag
-% M = 0.093; %Massan på lemmar
-
-
-L = 2.5; %Lemmarnas längd
-Y0 = 0.5; %Längd på handtag
-M = 4.0; %Massan på lemmar
+L = 3.5; %Lemmarnas längd
+Y0 = 0.1; %Längd på handtag
+M = 0.093; %Massan på lemmar
 
 kappa =620; %Fjäder konstant för bågen
-m = 1.0; %Massan på pilen
+m = 0.025; %Massan på pilen
 
 theta0= 0.3491;
 

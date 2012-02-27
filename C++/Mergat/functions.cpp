@@ -104,6 +104,12 @@ float force(float _drawLength)
 	_kappa = 620.0f;
 	_mArrow = 0.025f;
 
+	//_l = 2.5f;
+	//_halfHandle = 0.5f;
+	//_mLimb = 4.0f; 
+	//_kappa = 620.0f;
+	//_mArrow = 1.0f;
+
 	//KOD!
 	_x0 = _l * sin(_theta0);
 	_l0 = _halfHandle + (_l * cos(_theta0));
@@ -146,8 +152,14 @@ void Arrowpos()
 	_vArrowAngle.clear();
 	_timeOfFlight = 0;
 
+
 	_l				= 0.5f; /*Lemmarnas längd*/
 	_mArrow			= 0.025f; /*Massan på pilen*/
+
+	//_l				= 2.5f; /*Lemmarnas längd*/
+	//_mArrow			= 1.0f; /*Massan på pilen*/
+
+
 	_x0				= _l*sin(_theta0); /*Stränghöjd i startläge*/
 	g				= 9.82f; /*gravitation*/
 	//_vinkel= (45.0f*Pi/180.0f); /*utgångsvinkel*/

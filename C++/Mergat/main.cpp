@@ -221,7 +221,7 @@ void initRendering() {
 int main(void)
 {
 	Init();
-	testLoad();
+	//testLoad();
 	//LoadGLTextures();
 	Main_Loop();
 	Shut_Down(0);
@@ -267,10 +267,10 @@ void Init(void)
 
 	LIGHT();
 
-	//initRendering();
+	initRendering();
 	_terrain = loadTerrain("Data/heightmap2.bmp", 20);
 
-  	glEnable(GL_TEXTURE_2D);							// Enable Texture Mapping ( NEW )
+/*  	glEnable(GL_TEXTURE_2D);			*/				// Enable Texture Mapping ( NEW )
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);				// Black Background
 
@@ -351,7 +351,7 @@ void DrawMap()
 {
 
 	
-	float scale = 200.0f / max(_terrain->width() - 1, _terrain->length() - 1);
+	float scale = 2000.0f / max(_terrain->width() - 1, _terrain->length() - 1);
 	glScalef(scale, scale, scale);
 	glTranslatef(-(float)(_terrain->width() - 1) / 2,
 				 0.0f,
@@ -498,9 +498,10 @@ void Draw(void)
 
 	glPushMatrix();
 
-	glPushMatrix();
-		SkyBox();
-		glPopMatrix();
+	//glPushMatrix();
+	//	SkyBox();
+		//glPopMatrix();
+
 		//Ballista
 		glPushMatrix();	
 
