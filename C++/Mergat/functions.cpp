@@ -98,17 +98,17 @@ float  rsum(float a,float b,int n)
 float force(float _drawLength)
 {
 	//Deklarrera variabler
-    _l = 0.5f;
-	_halfHandle = 0.1f;
-	_mLimb = 0.093f; 
-	_kappa = 620.0f;
-	_mArrow = 0.025f;
-
-	//_l = 2.5f;
-	//_halfHandle = 0.5f;
-	//_mLimb = 4.0f; 
+ //   _l = 0.5f;
+	//_halfHandle = 0.1f;
+	//_mLimb = 0.093f; 
 	//_kappa = 620.0f;
-	//_mArrow = 1.0f;
+	//_mArrow = 0.025f;
+
+	_l = 3.0f;
+	_halfHandle = 0.5f;
+	_mLimb = 14.0f; 
+	_kappa = 3000.0f;
+	_mArrow = 5.0f;
 
 	//KOD!
 	_x0 = _l * sin(_theta0);
@@ -153,11 +153,11 @@ void Arrowpos()
 	_timeOfFlight = 0;
 
 
-	_l				= 0.5f; /*Lemmarnas längd*/
-	_mArrow			= 0.025f; /*Massan på pilen*/
+	//_l				= 0.5f; /*Lemmarnas längd*/
+	//_mArrow			= 0.025f; /*Massan på pilen*/
 
-	//_l				= 2.5f; /*Lemmarnas längd*/
-	//_mArrow			= 1.0f; /*Massan på pilen*/
+	_l				= 3.0f; /*Lemmarnas längd*/
+	_mArrow			= 5.0f; /*Massan på pilen*/
 
 
 	_x0				= _l*sin(_theta0); /*Stränghöjd i startläge*/
@@ -165,7 +165,7 @@ void Arrowpos()
 	//_vinkel= (45.0f*Pi/180.0f); /*utgångsvinkel*/
 	_vinkel			=getFireAngle();
 	_BallistaHeight	= 1.0f; /*Start höjd*/
-	_totalDrag		= 0.7f;
+	_totalDrag		= 5.0f;
 	_pullBack		= _totalDrag-_x0; /*Hur långt vi drar pilen*/
 	_work			= rsum(_pullBack,_x0,600); /*Pilens utgångshastighet när tilen dras tillbaka*/
 	

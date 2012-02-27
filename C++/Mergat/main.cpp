@@ -538,7 +538,7 @@ void Draw(void)
 		glColor3f(0.0f, 1.0f, 0.0f);
 		glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
 		DrawMap();
-		drawGround();
+		//drawGround();
 	glPopMatrix();
  
     // ----- Stop Drawing Stuff! ------
