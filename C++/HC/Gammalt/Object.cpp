@@ -1,38 +1,34 @@
-#include <stdio.h> // Needed only for sprintf()
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
-#include <iterator>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <cmath>
-#include <cctype>
 #include <algorithm>
 #include <GL/glfw.h>
+#include "Object.h"
 
 using namespace std;
 
+Object::Object(){
 
-vector<float> vertexVec;
-vector<float> textureVec;
-vector<float> normalVec;
-vector<int> indiceVec;
+}
 
-vector<int> fVert;
-vector<int> fTex;
-vector<int> fNorm;
-
-float xf, yf, zf;
-int   v,uv,n;
-
-
-void parseObj(	string filename,	
-				vector<GLfloat> &vertices, 
-				vector<GLfloat> &texcoords, 
-				vector<GLfloat> &normals, 
-				vector<GLuint> &indices) 
+Object::Object(string filename)
 {
+	vector<float> vertexVec, 
+				  textureVec,
+				  normalVec;
+	vector<int> indiceVec;
+
+	vector<int> fVert,
+				fTex,
+				fNorm;
+
+	float xf, yf, zf;
+	int   v,uv,n;
+
+
 	ifstream inFile;
 	inFile.open(filename.c_str());
 
@@ -235,4 +231,21 @@ void parseObj(	string filename,
 
 
 	
+}
+
+void Object::DrawObject()
+{
+	// Draw the scene
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glNormalPointer(GL_FLOAT, 0, normals.data());
+	glTexCoordPointer(3, GL_FLOAT, 0, texcoords.data());
+	glVertexPointer(3, GL_FLOAT, 0, vertices.data());
+
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
 }

@@ -1,16 +1,16 @@
 #include "alexFunc.h"
 #include "functions.h"
+#include "parseObj.h"
 #include <SOIL.h>
-#include <iostream>
 
-using namespace std;
+
 const float TO_RADS = 3.141592654f / 180.0f;
 
 static float zoomFactor=1.0;
 GLdouble move_x=5.0,
 	move_y=5.0,
 	move_z=0,
-	max_angle = 50.0,
+	max_angle = 70.0,
 	min_angle = 0;
 
 const int window_width = 800,
@@ -73,7 +73,10 @@ double pushtime			= 0;
 
 void setProjectionMatrix ()
 {
-
+	//glMatrixMode(GL_PROJECTION);
+	//glLoadIdentity();
+	//float aspect_ratio = ((float)window_height) / window_width;
+	//glFrustum(.5, -.5, -.5 * aspect_ratio, .5 * aspect_ratio, 1, 50);
 	
 	
 	glMatrixMode(GL_PROJECTION);
@@ -120,7 +123,14 @@ void calculate_Arrow(double current_time)
 GLfloat getArrowRotation()
 {
 
+	if(firetheballista == false) 
+	{
+		//GLfloat temp = getFireAngle();
+		return getFireAngle();
+	}
+
 		return getArrowAngle();
+
 
 }
 
@@ -128,8 +138,10 @@ void MOVE_ARROW()
 {		
 	glTranslatef(getArrowXpos(),getArrowYpos(),0);  
 	
+	if(firetheballista == true)
+	{
 		glRotatef(getArrowRotation(),0,0,1);
-
+	}
 }
 
 
@@ -161,6 +173,7 @@ void handleMouseMove(int mouseX, int mouseY)
     GLfloat vertMouseSensitivity  = 10.0f;
     GLfloat horizMouseSensitivity = 10.0f;
  
+    //cout << "Mouse cursor is at position (" << mouseX << ", " << mouseY << endl;
  
     int horizMovement = mouseX - midWindowX;
     int vertMovement  = mouseY - midWindowY;
@@ -402,7 +415,6 @@ void handleKeypress(int theKey, int theAction)
 
 		case 'F':
 			firetheballista = true;
-			ResetIndex();
 			pushtime = glfwGetTime();
 			Arrowpos();
 			break;

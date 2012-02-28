@@ -11,7 +11,6 @@ float getArrowposY(float time);
 double getTimeOfFlight();
 void setFireAngle(float _tempVinkel);
 float getarrowAngle(float time);
-void ResetIndex();
 
 
 #endif
