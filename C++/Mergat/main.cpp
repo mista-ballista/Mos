@@ -291,7 +291,6 @@ void Init(void)
 
     glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
  
-    glLineWidth(2.0f);			// Set a 'chunky' line width
 
 
 
