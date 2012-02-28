@@ -49,6 +49,7 @@ double current_time = 0.0;
 
 GLuint	texture[1];
 GLuint _testTexure[1];
+GLuint textureTest[3];
  
 vector<GLfloat> vertices;
 vector<GLfloat> texcoords;
@@ -207,6 +208,7 @@ bool LoadTextures()
 }
 
 void initRendering() {
+	glfwInit();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHTING);
@@ -214,6 +216,14 @@ void initRendering() {
 	glEnable(GL_NORMALIZE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_TEXTURE_2D);
+	//Testar texturer frn 3d-lab6
+	glGenTextures(3, textureTest);
+	glBindTexture(GL_TEXTURE_2D, textureTest[0]); // Activate first texture
+    glfwLoadTexture2D("Data/moon.tga", GLFW_BUILD_MIPMAPS_BIT); // Load image
+    glBindTexture(GL_TEXTURE_2D, textureTest[1]); // Activate second texture
+    glfwLoadTexture2D("Data/random.tga", GLFW_BUILD_MIPMAPS_BIT);
+	glBindTexture(GL_TEXTURE_2D, textureTest[2]); // Activate second texture
+    glfwLoadTexture2D("Data/sun.tga", GLFW_BUILD_MIPMAPS_BIT);
 	//LoadTextures();
 }
 
@@ -222,7 +232,7 @@ int main(void)
 {
 	Init();
 	//testLoad();
-	//LoadGLTextures();
+	LoadGLTextures();
 	Main_Loop();
 	Shut_Down(0);
 }
@@ -506,11 +516,12 @@ void Draw(void)
 		glPushMatrix();	
 
 			//Matrismultiplikationer som rör Ballistan här!
-			glColor3f(1.0f, 0.0f, 0.0f);
+			//glColor3f(1.0f, 0.0f, 0.0f);
 
 			rotateBallista();
 			glTranslatef(0.0f, 0.0f, 0.0f);
 			glScalef(0.2f, 0.2f, 0.2f);
+			glBindTexture(GL_TEXTURE_2D, textureTest[0]);
 			objBallista.DrawObject();
 		
 			//Arrow
@@ -525,18 +536,20 @@ void Draw(void)
 		//Borg	
 		glPushMatrix();
 			//Matrismultiplikationer som rör Borgen här!	
-			glColor3f(0.0f, 0.0f, 1.0f);
+			//glColor3f(0.0f, 0.0f, 1.0f);
 			glTranslatef(0.0f, 0.0f, 50.0f);
 			glScalef(5.0f, 5.0f, 5.0f);
-			glRotatef(0.0f, 0.0f, 1.0f, 0.0f);		
+			glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
+			glBindTexture(GL_TEXTURE_2D, textureTest[1]);
 			objBorg.DrawObject();		
 		glPopMatrix();
 
 
 		//Terräng och "markplan"
 		//Matrismultiplikationer som rör Heightmap här!	
-		glColor3f(0.0f, 1.0f, 0.0f);
+		//glColor3f(0.0f, 1.0f, 0.0f);
 		glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
+		glBindTexture(GL_TEXTURE_2D, textureTest[2]);
 		DrawMap();
 		//drawGround();
 	glPopMatrix();
