@@ -6,11 +6,11 @@
 #include <stdlib.h>
 #include <SOIL.h>
 #include <vector>
+#include "parseObj.h"
 #include <cmath>
 #include <stdio.h>
 #include "alexFunc.h"
 #include "functions.h"
-#include "Object.h"
 
 
 /////////
@@ -28,28 +28,18 @@ void Shut_Down(int return_code);
 void Main_Loop(void);
 void Draw_Square(float red, float green, float blue);
 void Draw(void);
-void LIGHT(void);
 
 using namespace std;
 
-string strArrow = "Data/bigArrow.obj";
-string strBallista = "Data/ballista.obj";
-string strBorg = "Data/Borg.obj";
+string objname = "Data/bigArrow.obj";
 char texname[] = "Data/johda2.tga";
 
-Object objArrow(strArrow);
-Object objBallista(strBallista);
-Object objBorg(strBorg);
-
 int frames = 0;
-float roll;
 double t0 = 0.0;
 char titlestring[200];
 double current_time = 0.0;
 
 GLuint	texture[1];
-GLuint _testTexure[1];
-GLuint textureTest[3];
  
 vector<GLfloat> vertices;
 vector<GLfloat> texcoords;
@@ -57,6 +47,8 @@ vector<GLfloat> normals;
 vector<GLuint> indices;
 
 
+
+////////////////////
 
 //Loads a terrain from a heightmap.  The heights of the terrain range from
 //-height / 2 to height / 2.
@@ -145,7 +137,6 @@ Terrain* _terrain;
 BITMAPINFOHEADER	landInfo;
 unsigned char*       landTexture;
 unsigned int		   land;
-GLUquadric *myQuad;
 
 
 void cleanup() {
@@ -174,26 +165,10 @@ int LoadGLTextures()
 	return true;
 }
 
-void testLoad()
-{	
-
-	myQuad=gluNewQuadric();
-	_testTexure[0] = SOIL_load_OGL_texture
-		(
-		texname,
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_INVERT_Y
-		);
-
-	if(_testTexure[0]  == 0)
-		Shut_Down(1);
-}
-
 bool LoadTextures()
 {
 	// load the land texture data
-	landTexture = LoadBitmapFile("Data/green.bmp", &landInfo);
+	landTexture = LoadBitmapFile("Terrain2.bmp", &landInfo);
 	if (!landTexture)
 		return false;
 
@@ -208,7 +183,6 @@ bool LoadTextures()
 }
 
 void initRendering() {
-	glfwInit();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHTING);
@@ -216,22 +190,13 @@ void initRendering() {
 	glEnable(GL_NORMALIZE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_TEXTURE_2D);
-	//Testar texturer frn 3d-lab6
-	glGenTextures(3, textureTest);
-	glBindTexture(GL_TEXTURE_2D, textureTest[0]); // Activate first texture
-    glfwLoadTexture2D("Data/moon.tga", GLFW_BUILD_MIPMAPS_BIT); // Load image
-    glBindTexture(GL_TEXTURE_2D, textureTest[1]); // Activate second texture
-    glfwLoadTexture2D("Data/random.tga", GLFW_BUILD_MIPMAPS_BIT);
-	glBindTexture(GL_TEXTURE_2D, textureTest[2]); // Activate second texture
-    glfwLoadTexture2D("Data/sun.tga", GLFW_BUILD_MIPMAPS_BIT);
-	//LoadTextures();
+	LoadTextures();
 }
 
 
 int main(void)
 {
 	Init();
-	//testLoad();
 	LoadGLTextures();
 	Main_Loop();
 	Shut_Down(0);
@@ -275,12 +240,10 @@ void Init(void)
 	setProjectionMatrix ();
 	setViewMatrix();
 
-	LIGHT();
-
 	initRendering();
-	_terrain = loadTerrain("Data/heightmap2.bmp", 20);
+	_terrain = loadTerrain("heightmap.bmp", 20);
 
-/*  	glEnable(GL_TEXTURE_2D);			*/				// Enable Texture Mapping ( NEW )
+  	glEnable(GL_TEXTURE_2D);							// Enable Texture Mapping ( NEW )
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);				// Black Background
 
@@ -289,10 +252,12 @@ void Init(void)
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 
-    glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
+    //glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
  
+    glLineWidth(2.0f);			// Set a 'chunky' line width
 
-
+	// Ladda in objekt
+	parseObj(objname, vertices, texcoords, normals, indices);
 
 
 }
@@ -348,11 +313,11 @@ void Main_Loop(void)
 
 void LIGHT()
 {
-	GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f};
+	GLfloat ambientColor[] = {0.4f, 0.4f, 0.4f, 1.0f};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
 	
 	GLfloat lightColor0[] = {0.6f, 0.6f, 0.6f, 1.0f};
-	GLfloat lightPos0[] = {-0.0f, 20.0f, 0.1f, 0.0f};
+	GLfloat lightPos0[] = {-0.5f, 20.8f, 0.1f, 0.0f};
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
 }
@@ -360,7 +325,7 @@ void DrawMap()
 {
 
 	
-	float scale = 2000.0f / max(_terrain->width() - 1, _terrain->length() - 1);
+	float scale = 100.0f / max(_terrain->width() - 1, _terrain->length() - 1);
 	glScalef(scale, scale, scale);
 	glTranslatef(-(float)(_terrain->width() - 1) / 2,
 				 0.0f,
@@ -387,94 +352,141 @@ void DrawMap()
 	}
 }
 
-void SkyBox()
+void DrawScene ()
 {
 
-	glDisable(GL_DEPTH);
-	glDisable(GL_LIGHTING);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColor4f(1,1,1,1);
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, _testTexure[0]);
-	glTranslatef(0,0,0);
-	glRotatef(90,1,0,1);
-	gluSphere(myQuad,500,200,200);
-	glRotatef(roll/10, 0.2, 1, 0);
-	glColor4f(1, 1, 1, cos(roll/12));
-	gluSphere(myQuad, 500-0.8, 200, 200);
-	glEnable(GL_DEPTH);
-	glDisable(GL_BLEND);
-	glEnable(GL_LIGHTING);
-	roll+=0.002f;
+	// Draw the scene
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glNormalPointer(GL_FLOAT, 0, normals.data());
+	glTexCoordPointer(3, GL_FLOAT, 0, texcoords.data());
+	glVertexPointer(3, GL_FLOAT, 0, vertices.data());
+
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
+	//glDrawArrays(GL_TRIANGLES, 0, (vertices.size()));
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+}
+
+
+void Draw_3DSquare()
+{
+
+	GLfloat vertices[] = {
+		-1.0000,	0.0000,	 1.0000,
+		-1.0000,	0.0000,	 -1.0000,
+		1.0000,	0.0000,	 -1.0000,
+		1.0000,	0.0000,	 1.0000,
+		-1.0000,	2.0000,	 1.0000,
+		1.0000,	2.0000,	 1.0000,
+		1.0000,	2.0000,	 -1.0000,
+		-1.0000,	2.0000,	 -1.0000};
+
+
+
+		GLubyte indices[] = {
+			0, 1, 2, 3, 
+			4, 5, 6, 7, 
+			0, 3, 5, 4,
+			3, 2, 6, 5,
+			2, 1, 7, 6, 
+			1, 0, 4, 7}; 
+
+			GLfloat normals[] = {
+				0.0000, -1.0000, -0.0000,
+				0.0000, 1.0000, -0.0000,
+				0.0000, 0.0000, 1.0000,
+				1.0000, 0.0000, -0.0000,
+				0.0000, 0.0000, -1.0000,
+				-1.0000, 0.0000, -0.0000};
+
+
+				GLfloat texcoord[] = {
+					1,0,	1,1,	0,1,	0,0,
+					0,0,	1,0,	1,1,	0,1,
+					0,0,	1,0,	1,1,	0,1,
+					0,0,	1,0,	1,1,	0,1,
+					0,0,	1,0,	1,1,	0,1,
+					0,0,	1,0,	1,1,	0,1,};
+
+					glEnableClientState(GL_NORMAL_ARRAY);
+					glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+					glEnableClientState(GL_VERTEX_ARRAY);
+					glNormalPointer(GL_FLOAT,0,normals);
+					glTexCoordPointer(2, GL_FLOAT, 0, texcoord);
+					glVertexPointer(3, GL_FLOAT, 0, vertices);
+
+					glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, indices);
+
+					glDisableClientState(GL_VERTEX_ARRAY);
+					glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+					glDisableClientState(GL_NORMAL_ARRAY);
+
 
 }
+
  
 void Draw(void)
 {
 
+	/*DrawScene();*/
 
 	 // Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	
+	LIGHT();
     // Reset the matrix
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity(); 
+    glLoadIdentity();
+ 
 
 	Move_Camera();
 
 
-		
-	//Scengraf
+	//Avkommentera detta när HCs klass fungerar!
+	////Scengraf
+
+	////Terräng
+	//glPushMatrix();
+	//DrawMap();
+
+	//	//Ballista
+	//	glPushMatrix();
+	//	//Ballista.Draw();
+
+	//		//Arrow
+	//		glPushMatrix();
+	//		//Arrow.Draw();
+	//		glPopMatrix();
+	//	glPopMatrix();
+
+	//	//Borg
+	//	glPushMatrix();
+	//	//Borg.Draw();
+	//	glPopMatrix();
+	//glPopMatrix();
 
 	glPushMatrix();
 
-	//glPushMatrix();
-	//	SkyBox();
-		//glPopMatrix();
+	rotateBallista();
 
-		//Ballista
-		glPushMatrix();	
+	MOVE_ARROW();
 
-			//Matrismultiplikationer som rör Ballistan här!
-			//glColor3f(1.0f, 0.0f, 0.0f);
+	DrawScene();
 
-			rotateBallista();
-			glTranslatef(0.0f, 0.0f, 0.0f);
-			glScalef(0.2f, 0.2f, 0.2f);
-			glBindTexture(GL_TEXTURE_2D, textureTest[0]);
-			objBallista.DrawObject();
-		
-			//Arrow
-			glPushMatrix();		
-				//Matrismultiplikationer som rör Pilen här!
-				glRotatef(90.0 , 0.0f, 1.0f, 0.0f);
-				MOVE_ARROW();
-				objArrow.DrawObject();			
-			glPopMatrix();
-		glPopMatrix();
-		
-		//Borg	
-		glPushMatrix();
-			//Matrismultiplikationer som rör Borgen här!	
-			//glColor3f(0.0f, 0.0f, 1.0f);
-			glTranslatef(0.0f, 0.0f, 50.0f);
-			glScalef(5.0f, 5.0f, 5.0f);
-			glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
-			glBindTexture(GL_TEXTURE_2D, textureTest[1]);
-			objBorg.DrawObject();		
-		glPopMatrix();
-
-
-		//Terräng och "markplan"
-		//Matrismultiplikationer som rör Heightmap här!	
-		//glColor3f(0.0f, 1.0f, 0.0f);
-		glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
-		glBindTexture(GL_TEXTURE_2D, textureTest[2]);
-		DrawMap();
-		//drawGround();
 	glPopMatrix();
+
+	glTranslatef(0.0f, -5.0f, 0.0f);
+
+	DrawMap();
+
+	glPopMatrix();
+
+	drawGround();
+
+
  
     // ----- Stop Drawing Stuff! ------
  
