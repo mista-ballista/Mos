@@ -49,8 +49,10 @@ double current_time = 0.0;
 
 GLuint	texture[1];
 GLuint _testTexure[1];
-GLuint textureTest[3];
+GLuint textureTest[4];
  
+GLfloat	fogColor[4] = {0.5f,0.5f,0.5f,1.0f};
+
 vector<GLfloat> vertices;
 vector<GLfloat> texcoords;
 vector<GLfloat> normals;
@@ -174,9 +176,38 @@ int LoadGLTextures()
 	return true;
 }
 
+void testLoad()
+{	
 
+	myQuad=gluNewQuadric();
+	_testTexure[0] = SOIL_load_OGL_texture
+		(
+		texname,
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_INVERT_Y
+		);
 
+	if(_testTexure[0]  == 0)
+		Shut_Down(1);
+}
 
+bool LoadTextures()
+{
+	// load the land texture data
+	landTexture = LoadBitmapFile("Data/green.bmp", &landInfo);
+	if (!landTexture)
+		return false;
+
+	// generate the land texture as a mipmap
+	glGenTextures(1, &land);                  
+	glBindTexture(GL_TEXTURE_2D, land);       
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, landInfo.biHeight, landInfo.biWidth, GL_RGB, GL_UNSIGNED_BYTE, landTexture);
+
+	return true;
+}
 
 void initRendering() {
 	glfwInit();
@@ -195,12 +226,16 @@ void initRendering() {
     glfwLoadTexture2D("Data/random.tga", GLFW_BUILD_MIPMAPS_BIT);
 	glBindTexture(GL_TEXTURE_2D, textureTest[2]); // Activate second texture
     glfwLoadTexture2D("Data/sun.tga", GLFW_BUILD_MIPMAPS_BIT);
+	glBindTexture(GL_TEXTURE_2D, textureTest[3]);
+	glfwLoadTexture2D("Data/test.tga", GLFW_BUILD_MIPMAPS_BIT);
+	//LoadTextures();
 }
 
 
 int main(void)
 {
 	Init();
+	//testLoad();
 	LoadGLTextures();
 	Main_Loop();
 	Shut_Down(0);
@@ -243,12 +278,13 @@ void Init(void)
 	
 	setProjectionMatrix ();
 	setViewMatrix();
-
+	myQuad = gluNewQuadric ();
 	LIGHT();
 
 	initRendering();
 	_terrain = loadTerrain("Data/heightmap2.bmp", 20);
 
+/*  	glEnable(GL_TEXTURE_2D);			*/				// Enable Texture Mapping ( NEW )
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);				// Black Background
 
@@ -257,7 +293,19 @@ void Init(void)
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 
+
+	glFogi(GL_FOG_MODE, GL_LINEAR);			// Fog Mode
+	glFogfv(GL_FOG_COLOR, fogColor);					// Set Fog Color
+	glFogf(GL_FOG_DENSITY, 0.35f);						// How Dense Will The Fog Be
+	glHint(GL_FOG_HINT, GL_DONT_CARE);					// Fog Hint Value
+	glFogf(GL_FOG_START, 100.0f);							// Fog Start Depth
+	glFogf(GL_FOG_END, 300.0f);							// Fog End Depth
+	glEnable(GL_FOG);									// Enables GL_FOG
+
     glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
+ 
+
+
 
 
 }
@@ -473,8 +521,9 @@ void Draw(void)
 	glPushMatrix();
 
 	//glPushMatrix();
+	////glBindTexture(GL_TEXTURE_2D, textureTest[3]);
 	//	SkyBox();
-		//glPopMatrix();
+	//	glPopMatrix();
 
 		//Ballista
 		glPushMatrix();	
@@ -514,7 +563,9 @@ void Draw(void)
 		//glColor3f(0.0f, 1.0f, 0.0f);
 		glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
 		glBindTexture(GL_TEXTURE_2D, textureTest[2]);
+		glTranslatef(0.0f,335.0f,0.0f);
 		DrawMap();
+		//drawGround();
 	glPopMatrix();
  
     // ----- Stop Drawing Stuff! ------
