@@ -1,32 +1,23 @@
 #define WIN32_LEAN_AND_MEAN
 #define BITMAP_ID 0x4D42
 
-
 #include <GL/glfw.h>
 #include <stdlib.h>
-#include <SOIL.h>
 #include <vector>
 #include <cmath>
 #include <stdio.h>
 #include "alexFunc.h"
 #include "functions.h"
 #include "Object.h"
-
-
-/////////
-
-
 #include <iostream>
 #include <windows.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
-
 #include "Terrain.h"
 
 void Init(void);
 void Shut_Down(int return_code);
 void Main_Loop(void);
-void Draw_Square(float red, float green, float blue);
 void Draw(void);
 void LIGHT(void);
 void FOG(void);
@@ -48,8 +39,6 @@ double t0 = 0.0;
 char titlestring[200];
 double current_time = 0.0;
 
-GLuint	texture[1];
-GLuint _testTexure[1];
 GLuint textureTest[4];
  
 GLfloat	fogColor[4] = {0.5f,0.5f,0.5f,1.0f};
@@ -59,6 +48,8 @@ vector<GLfloat> texcoords;
 vector<GLfloat> normals;
 vector<GLuint> indices;
 
+Terrain* _terrain;
+GLUquadric *myQuad;
 
 
 //Loads a terrain from a heightmap.  The heights of the terrain range from
@@ -143,110 +134,20 @@ unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER *bitmapInfoHeader
 	return bitmapImage;
 }
 
-float _angle = 60.0f;
-Terrain* _terrain;
-BITMAPINFOHEADER	landInfo;
-unsigned char*       landTexture;
-unsigned int		   land;
-GLUquadric *myQuad;
-
-
 void cleanup() {
 	delete _terrain;
 }
 
-int LoadGLTextures()
-{
-	/* load an image file directly as a new OpenGL texture */
-	texture[0] = SOIL_load_OGL_texture
-		(
-		texname,
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_INVERT_Y
-		);
-
-	if(texture[0] == 0)
-		Shut_Down(1);
-
-	// Typical Texture Generation Using Data From The Bitmap
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-
-	return true;
-}
-
-void testLoad()
-{	
-
-	myQuad=gluNewQuadric();
-	_testTexure[0] = SOIL_load_OGL_texture
-		(
-		texname,
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_INVERT_Y
-		);
-
-	if(_testTexure[0]  == 0)
-		Shut_Down(1);
-}
-
-bool LoadTextures()
-{
-	// load the land texture data
-	landTexture = LoadBitmapFile("Data/green.bmp", &landInfo);
-	if (!landTexture)
-		return false;
-
-	// generate the land texture as a mipmap
-	glGenTextures(1, &land);                  
-	glBindTexture(GL_TEXTURE_2D, land);       
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, landInfo.biHeight, landInfo.biWidth, GL_RGB, GL_UNSIGNED_BYTE, landTexture);
-
-	return true;
-}
-
-void initRendering() {
-	glfwInit();
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_NORMALIZE);
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_TEXTURE_2D);
-	//Testar texturer frn 3d-lab6
-	glGenTextures(3, textureTest);
-	glBindTexture(GL_TEXTURE_2D, textureTest[0]); // Activate first texture
-    glfwLoadTexture2D("Data/moon.tga", GLFW_BUILD_MIPMAPS_BIT); // Load image
-    glBindTexture(GL_TEXTURE_2D, textureTest[1]); // Activate second texture
-    glfwLoadTexture2D("Data/random.tga", GLFW_BUILD_MIPMAPS_BIT);
-	glBindTexture(GL_TEXTURE_2D, textureTest[2]); // Activate second texture
-    glfwLoadTexture2D("Data/sun.tga", GLFW_BUILD_MIPMAPS_BIT);
-	glBindTexture(GL_TEXTURE_2D, textureTest[3]);
-	glfwLoadTexture2D("Data/johda2.tga", GLFW_BUILD_MIPMAPS_BIT);
-	//LoadTextures();
-}
-
-
 int main(void)
 {
 	Init();
-	//testLoad();
-	LoadGLTextures();
 	Main_Loop();
 	Shut_Down(0);
 }
 
-
 void showFPS() {
 
-    double t, fps;
-    
+    double t, fps;    
     // Get current time
     t = glfwGetTime();  // Gets number of seconds since glfwInit()
     // If one second has passed, or if this is the very first frame
@@ -260,8 +161,6 @@ void showFPS() {
     }
     frames ++;
 }
-
-
  
 void Init(void)
 {
@@ -280,41 +179,47 @@ void Init(void)
 	
 	setProjectionMatrix ();
 	setViewMatrix();
-	myQuad = gluNewQuadric ();
-	LIGHT();
+	myQuad = gluNewQuadric ();	
 
-	initRendering();
 	_terrain = loadTerrain("Data/heightmap2.bmp", 20);
 
-/*  	glEnable(GL_TEXTURE_2D);			*/				// Enable Texture Mapping ( NEW )
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+  	glEnable(GL_TEXTURE_2D);							// Enable Texture Mapping ( NEW )
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);				// Black Background
-
 	glClearDepth(1.0f);									// Depth Buffer Setup
 	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
+	glEnable(GL_CULL_FACE);								// Do not draw polygons facing away from us
 
+	//Skapa texturer
+	glGenTextures(3, textureTest);
+	glBindTexture(GL_TEXTURE_2D, textureTest[0]); // Activate first texture
+    glfwLoadTexture2D("Data/moon.tga", GLFW_BUILD_MIPMAPS_BIT); // Load image
+    glBindTexture(GL_TEXTURE_2D, textureTest[1]); // Activate second texture
+    glfwLoadTexture2D("Data/earth.tga", GLFW_BUILD_MIPMAPS_BIT);
+	glBindTexture(GL_TEXTURE_2D, textureTest[2]); // Activate second texture
+    glfwLoadTexture2D("Data/sun.tga", GLFW_BUILD_MIPMAPS_BIT);
+	glBindTexture(GL_TEXTURE_2D, textureTest[3]);
+	glfwLoadTexture2D("Data/test.tga", GLFW_BUILD_MIPMAPS_BIT);	
+	
+	LIGHT(); 
 	FOG();
-
-    glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
- 
-
-
-
-
 }
 
 void FOG()
-{
-	
+{	
 	glFogi(GL_FOG_MODE, GL_LINEAR);			// Fog Mode
-	glFogfv(GL_FOG_COLOR, fogColor);					// Set Fog Color
-	glFogf(GL_FOG_DENSITY, 0.005f);						// How Dense Will The Fog Be
-	glHint(GL_FOG_HINT, GL_NICEST);					// Fog Hint Value
-	glFogf(GL_FOG_START, 400.0f);							// Fog Start Depth
-	glFogf(GL_FOG_END, 800.0f);							// Fog End Depth
-	glEnable(GL_FOG);									// Enables GL_FOG
+	glFogfv(GL_FOG_COLOR, fogColor);		// Set Fog Color
+	glFogf(GL_FOG_DENSITY, 0.005f);			// How Dense Will The Fog Be
+	glHint(GL_FOG_HINT, GL_NICEST);			// Fog Hint Value
+	glFogf(GL_FOG_START, 400.0f);			// Fog Start Depth
+	glFogf(GL_FOG_END, 800.0f);				// Fog End Depth
+	glEnable(GL_FOG);						// Enables GL_FOG
 }
  
 void Shut_Down(int return_code)
@@ -334,52 +239,41 @@ void Main_Loop(void)
 	// Specify the function which should execute when the mouse is moved
 	glfwSetMousePosCallback(handleMouseMove);
 
-
-  // this just loops as long as the program runs
-  while(1)
+  while(1)  // This just loops as long as the program runs
   {	
 	  double current_time = glfwGetTime();
-
 	  showFPS();
 
     // clear the buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // draw the figure
-	Draw();
 
+	Draw(); // Draw everything
 
 	// Calculate our camera movement
 	calculateCameraMovement();
-
 	calculate_BallistaAngle();
-	
-
 	setFireAngle(getFireAngle());
-
-	// Move our camera
-	moveCamera();
+	
+	moveCamera(); // Move our camera
 
 	calculate_Arrow(current_time);
-
-	// swap back and front buffers
-	glfwSwapBuffers();
+	
+	glfwSwapBuffers(); // swap back and front buffers
   }
 }
 
 void LIGHT()
 {
 	GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
-	
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);	
 	GLfloat lightColor0[] = {0.6f, 0.6f, 0.6f, 1.0f};
 	GLfloat lightPos0[] = {-0.0f, 20.0f, 0.1f, 0.0f};
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
 }
-void DrawMap()
-{
 
-	
+void DrawMap()
+{	
 	float scale = 2000.0f / max(_terrain->width() - 1, _terrain->length() - 1);
 	glScalef(scale, scale, scale);
 	glTranslatef(-(float)(_terrain->width() - 1) / 2,
@@ -409,14 +303,13 @@ void DrawMap()
 
 void SkyBox()
 {
-
 	glDisable(GL_DEPTH);
 	glDisable(GL_LIGHTING);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4f(1,1,1,1);
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, _testTexure[3]);
+	glBindTexture(GL_TEXTURE_2D, textureTest[3]);
 	glTranslatef(0,0,0);
 	glRotatef(90,1,0,1);
 	gluSphere(myQuad,500,200,200);
@@ -427,16 +320,12 @@ void SkyBox()
 	glDisable(GL_BLEND);
 	glEnable(GL_LIGHTING);
 	roll+=0.002f;
-
 }
  
 void Draw(void)
 {
-
-
 	 // Clear the screen and depth buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
     // Reset the matrix
     glMatrixMode(GL_MODELVIEW);
@@ -444,13 +333,10 @@ void Draw(void)
 
 	Move_Camera();
 
-
-		
-	//Scengraf
-
+	// ----------- SCENGRAF -----------
+	glPushMatrix();
 	glPushMatrix();
 
-	glPushMatrix();
 	//glBindTexture(GL_TEXTURE_2D, textureTest[3]);
 	glScalef(-1.0f,-1.0f,-1.0f);
 		SkyBox();
@@ -461,7 +347,6 @@ void Draw(void)
 
 			//Matrismultiplikationer som rör Ballistan här!
 			//glColor3f(1.0f, 0.0f, 0.0f);
-
 			rotateBallista();
 			glTranslatef(0.0f, 0.0f, 0.0f);
 			glScalef(0.2f, 0.2f, 0.2f);
@@ -488,7 +373,6 @@ void Draw(void)
 			objBorg.DrawObject();		
 		glPopMatrix();
 
-
 		//Terräng och "markplan"
 		//Matrismultiplikationer som rör Heightmap här!	
 		//glColor3f(0.0f, 1.0f, 0.0f);
@@ -500,7 +384,4 @@ void Draw(void)
 	glPopMatrix();
  
     // ----- Stop Drawing Stuff! ------
- 
-
 }
-
