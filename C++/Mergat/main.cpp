@@ -29,6 +29,7 @@ void Main_Loop(void);
 void Draw_Square(float red, float green, float blue);
 void Draw(void);
 void LIGHT(void);
+void FOG(void);
 
 using namespace std;
 
@@ -227,7 +228,7 @@ void initRendering() {
 	glBindTexture(GL_TEXTURE_2D, textureTest[2]); // Activate second texture
     glfwLoadTexture2D("Data/sun.tga", GLFW_BUILD_MIPMAPS_BIT);
 	glBindTexture(GL_TEXTURE_2D, textureTest[3]);
-	glfwLoadTexture2D("Data/test.tga", GLFW_BUILD_MIPMAPS_BIT);
+	glfwLoadTexture2D("Data/johda2.tga", GLFW_BUILD_MIPMAPS_BIT);
 	//LoadTextures();
 }
 
@@ -259,6 +260,7 @@ void showFPS() {
     }
     frames ++;
 }
+
 
  
 void Init(void)
@@ -293,14 +295,7 @@ void Init(void)
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 
-
-	glFogi(GL_FOG_MODE, GL_LINEAR);			// Fog Mode
-	glFogfv(GL_FOG_COLOR, fogColor);					// Set Fog Color
-	glFogf(GL_FOG_DENSITY, 0.35f);						// How Dense Will The Fog Be
-	glHint(GL_FOG_HINT, GL_DONT_CARE);					// Fog Hint Value
-	glFogf(GL_FOG_START, 100.0f);							// Fog Start Depth
-	glFogf(GL_FOG_END, 300.0f);							// Fog End Depth
-	glEnable(GL_FOG);									// Enables GL_FOG
+	FOG();
 
     glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
  
@@ -308,6 +303,18 @@ void Init(void)
 
 
 
+}
+
+void FOG()
+{
+	
+	glFogi(GL_FOG_MODE, GL_LINEAR);			// Fog Mode
+	glFogfv(GL_FOG_COLOR, fogColor);					// Set Fog Color
+	glFogf(GL_FOG_DENSITY, 0.005f);						// How Dense Will The Fog Be
+	glHint(GL_FOG_HINT, GL_NICEST);					// Fog Hint Value
+	glFogf(GL_FOG_START, 400.0f);							// Fog Start Depth
+	glFogf(GL_FOG_END, 800.0f);							// Fog End Depth
+	glEnable(GL_FOG);									// Enables GL_FOG
 }
  
 void Shut_Down(int return_code)
@@ -400,6 +407,83 @@ void DrawMap()
 	}
 }
 
+void DrawScene ()
+{
+
+	// Draw the scene
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glNormalPointer(GL_FLOAT, 0, normals.data());
+	glTexCoordPointer(3, GL_FLOAT, 0, texcoords.data());
+	glVertexPointer(3, GL_FLOAT, 0, vertices.data());
+
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
+	//glDrawArrays(GL_TRIANGLES, 0, (vertices.size()));
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+}
+
+
+void Draw_3DSquare()
+{
+
+	GLfloat vertices[] = {
+		-1.0000,	0.0000,	 1.0000,
+		-1.0000,	0.0000,	 -1.0000,
+		1.0000,	0.0000,	 -1.0000,
+		1.0000,	0.0000,	 1.0000,
+		-1.0000,	2.0000,	 1.0000,
+		1.0000,	2.0000,	 1.0000,
+		1.0000,	2.0000,	 -1.0000,
+		-1.0000,	2.0000,	 -1.0000};
+
+
+
+		GLubyte indices[] = {
+			0, 1, 2, 3, 
+			4, 5, 6, 7, 
+			0, 3, 5, 4,
+			3, 2, 6, 5,
+			2, 1, 7, 6, 
+			1, 0, 4, 7}; 
+
+			GLfloat normals[] = {
+				0.0000, -1.0000, -0.0000,
+				0.0000, 1.0000, -0.0000,
+				0.0000, 0.0000, 1.0000,
+				1.0000, 0.0000, -0.0000,
+				0.0000, 0.0000, -1.0000,
+				-1.0000, 0.0000, -0.0000};
+
+
+				GLfloat texcoord[] = {
+					1,0,	1,1,	0,1,	0,0,
+					0,0,	1,0,	1,1,	0,1,
+					0,0,	1,0,	1,1,	0,1,
+					0,0,	1,0,	1,1,	0,1,
+					0,0,	1,0,	1,1,	0,1,
+					0,0,	1,0,	1,1,	0,1,};
+
+					glEnableClientState(GL_NORMAL_ARRAY);
+					glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+					glEnableClientState(GL_VERTEX_ARRAY);
+					glNormalPointer(GL_FLOAT,0,normals);
+					glTexCoordPointer(2, GL_FLOAT, 0, texcoord);
+					glVertexPointer(3, GL_FLOAT, 0, vertices);
+
+					glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, indices);
+
+					glDisableClientState(GL_VERTEX_ARRAY);
+					glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+					glDisableClientState(GL_NORMAL_ARRAY);
+
+
+}
+
+
 void SkyBox()
 {
 
@@ -409,7 +493,7 @@ void SkyBox()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4f(1,1,1,1);
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, _testTexure[0]);
+	glBindTexture(GL_TEXTURE_2D, _testTexure[3]);
 	glTranslatef(0,0,0);
 	glRotatef(90,1,0,1);
 	gluSphere(myQuad,500,200,200);
@@ -443,10 +527,11 @@ void Draw(void)
 
 	glPushMatrix();
 
-	//glPushMatrix();
-	////glBindTexture(GL_TEXTURE_2D, textureTest[3]);
-	//	SkyBox();
-	//	glPopMatrix();
+	glPushMatrix();
+	//glBindTexture(GL_TEXTURE_2D, textureTest[3]);
+	glScalef(-1.0f,-1.0f,-1.0f);
+		SkyBox();
+		glPopMatrix();
 
 		//Ballista
 		glPushMatrix();	
@@ -474,7 +559,7 @@ void Draw(void)
 			//Matrismultiplikationer som rör Borgen här!	
 			//glColor3f(0.0f, 0.0f, 1.0f);
 			glTranslatef(0.0f, 0.0f, 50.0f);
-			glScalef(5.0f, 5.0f, 5.0f);
+			glScalef(1.0f, 1.0f, 1.0f);
 			glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
 			glBindTexture(GL_TEXTURE_2D, textureTest[1]);
 			objBorg.DrawObject();		
