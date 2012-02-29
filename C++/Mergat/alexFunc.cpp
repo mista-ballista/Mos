@@ -126,7 +126,7 @@ GLfloat getArrowRotation()
 
 void MOVE_ARROW()
 {		
-	glTranslatef(getArrowXpos(),getArrowYpos(),0);  
+	glTranslatef(getArrowXpos()*10,getArrowYpos()*10,0);  
 	
 		glRotatef(getArrowRotation(),0,0,1);
 

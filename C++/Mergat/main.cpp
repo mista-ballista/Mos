@@ -24,8 +24,8 @@ void FOG(void);
 
 using namespace std;
 
-string strArrow = "Data/bigArrow.obj";
-string strBallista = "Data/ballista.obj";
+string strArrow = "Data/Arrow.obj";
+string strBallista = "Data/BaraBallista.obj";
 string strBorg = "Data/Borg.obj";
 char texname[] = "Data/johda2.tga";
 
@@ -217,8 +217,8 @@ void FOG()
 	glFogfv(GL_FOG_COLOR, fogColor);		// Set Fog Color
 	glFogf(GL_FOG_DENSITY, 0.005f);			// How Dense Will The Fog Be
 	glHint(GL_FOG_HINT, GL_NICEST);			// Fog Hint Value
-	glFogf(GL_FOG_START, 400.0f);			// Fog Start Depth
-	glFogf(GL_FOG_END, 800.0f);				// Fog End Depth
+	glFogf(GL_FOG_START, 100.0f);			// Fog Start Depth
+	glFogf(GL_FOG_END, 500.0f);				// Fog End Depth
 	glEnable(GL_FOG);						// Enables GL_FOG
 }
  
@@ -356,7 +356,7 @@ void Draw(void)
 			//Arrow
 			glPushMatrix();		
 				//Matrismultiplikationer som rör Pilen här!
-				glRotatef(90.0 , 0.0f, 1.0f, 0.0f);
+				glTranslatef(13.0f,20.0f,8.0f);
 				MOVE_ARROW();
 				objArrow.DrawObject();			
 			glPopMatrix();
