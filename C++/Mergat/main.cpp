@@ -14,6 +14,7 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 #include "Terrain.h"
+#include "skybox.h"
 
 void Init(void);
 void Shut_Down(int return_code);
@@ -50,7 +51,6 @@ vector<GLuint> indices;
 
 Terrain* _terrain;
 GLUquadric *myQuad;
-
 
 //Loads a terrain from a heightmap.  The heights of the terrain range from
 //-height / 2 to height / 2.
@@ -217,8 +217,8 @@ void FOG()
 	glFogfv(GL_FOG_COLOR, fogColor);		// Set Fog Color
 	glFogf(GL_FOG_DENSITY, 0.005f);			// How Dense Will The Fog Be
 	glHint(GL_FOG_HINT, GL_NICEST);			// Fog Hint Value
-	glFogf(GL_FOG_START, 100.0f);			// Fog Start Depth
-	glFogf(GL_FOG_END, 500.0f);				// Fog End Depth
+	glFogf(GL_FOG_START, 400.0f);			// Fog Start Depth
+	glFogf(GL_FOG_END, 1000.0f);				// Fog End Depth
 	glEnable(GL_FOG);						// Enables GL_FOG
 }
  
@@ -232,7 +232,6 @@ void Main_Loop(void)
 {
 	// the time of the previous frame
 	double old_time = glfwGetTime();
-
 	// Specify the function which should execute when a key is pressed or released
 	glfwSetKeyCallback(handleKeypress);
 
@@ -312,10 +311,10 @@ void SkyBox()
 	glBindTexture(GL_TEXTURE_2D, textureTest[3]);
 	glTranslatef(0,0,0);
 	glRotatef(90,1,0,1);
-	gluSphere(myQuad,500,200,200);
+	gluSphere(myQuad,1200,200,200);
 	glRotatef(roll/10, 0.2, 1, 0);
 	glColor4f(1, 1, 1, cos(roll/12));
-	gluSphere(myQuad, 500-0.8, 200, 200);
+	gluSphere(myQuad, 1200-0.8, 200, 200);
 	glEnable(GL_DEPTH);
 	glDisable(GL_BLEND);
 	glEnable(GL_LIGHTING);
@@ -327,6 +326,7 @@ void Draw(void)
 	 // Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
+	
     // Reset the matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity(); 
@@ -337,7 +337,7 @@ void Draw(void)
 	glPushMatrix();
 	glPushMatrix();
 
-	//glBindTexture(GL_TEXTURE_2D, textureTest[3]);
+	glBindTexture(GL_TEXTURE_2D, textureTest[3]);
 	glScalef(-1.0f,-1.0f,-1.0f);
 		SkyBox();
 		glPopMatrix();
@@ -378,10 +378,10 @@ void Draw(void)
 		//glColor3f(0.0f, 1.0f, 0.0f);
 		glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
 		glBindTexture(GL_TEXTURE_2D, textureTest[2]);
-		glTranslatef(0.0f,335.0f,0.0f);
+		glTranslatef(0.0f,0.0f,0.0f);
 		DrawMap();
-		//drawGround();
 	glPopMatrix();
+
  
     // ----- Stop Drawing Stuff! ------
 }
