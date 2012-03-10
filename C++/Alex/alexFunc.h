@@ -1,6 +1,9 @@
 #ifndef alexFunc_h
 #define alexFunc_h
 #include <gl/glfw.h>
+#include "Terrain.h"
+#include "Object.h"
+
 
 void setProjectionMatrix();
 void setViewMatrix();
@@ -27,6 +30,12 @@ GLfloat getFireAngle();
 GLfloat getArrowRotation();
 GLfloat getArrowAngle();
 bool Fired();
+void CheckCollision(Terrain* _terrain,double current_time, float scale);
+bool getCollision();
+void tempScale(float scale);
+float getScale();
+double getArrowSpeed();
+void Resetbow();
 
 GLfloat getCamXpos();
 GLfloat getCamYpos();
@@ -34,6 +43,10 @@ GLfloat getCamZpos();
 GLfloat getCamXRot();
 GLfloat getCamYRot();
 
+Object moveBow(Object objStuff);
+Object deformBowfunc(Object objStuff, int speed);
+bool getDeform();
+bool getReform();
 
 
 #endif

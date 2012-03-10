@@ -42,6 +42,14 @@ class Vec3f {
 		Vec3f operator+(const Vec3f &other) const;
 		Vec3f operator-(const Vec3f &other) const;
 		Vec3f operator-() const;
+
+		float getX(){return v[0];};
+		float getY(){return v[1];};
+		float getZ(){return v[2];};
+
+		void setX(float x){v[0] = x;};
+		void setY(float y){v[1] = y;};
+		void setZ(float z){v[2] = z;};
 		
 		const Vec3f &operator*=(float scale);
 		const Vec3f &operator/=(float scale);

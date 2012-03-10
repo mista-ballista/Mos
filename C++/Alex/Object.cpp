@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <GL/glfw.h>
 #include "Object.h"
+#include "vec3f.h"
 
 using namespace std;
 
@@ -201,9 +202,21 @@ Object::Object(string filename)
 	// MAKE ARRAYS ----------------------------------------//
 
 
-	for (int i = 0; i < vertexVec.size(); i++)
+	//for (int i = 0; i < vertexVec.size(); i++)
+	//{
+	//	vertices.push_back(vertexVec[i]);
+	//}
+
+	for (int i = 0; i < fVert.size(); i++)
 	{
-		vertices.push_back(vertexVec[i]);
+		indices.push_back(fVert[i]-1);
+	}
+
+	for (int i = 0; i < fVert.size(); i++)
+	{
+		vertices.push_back(vertexVec[ (fVert[i]-1)*3 ]);
+		vertices.push_back(vertexVec[ (fVert[i]-1)*3 + 1]);
+		vertices.push_back(vertexVec[ (fVert[i]-1)*3 + 2]);
 	}
 
 
@@ -224,28 +237,60 @@ Object::Object(string filename)
 	}
 
 
-	for (int i = 0; i < fVert.size(); i++)
-	{
-		indices.push_back(fVert[i]-1);
-	}
+
 
 
 	
 }
 
+void Object::createBoundingBox()
+{
+	min.setX(10000);
+	min.setY(10000);
+	min.setZ(10000);
+
+	max.setX(-10000);
+	max.setY(-10000);
+	max.setZ(-10000);
+
+	for (int i = 0; i < vertices.size(); i+=3)
+	{
+		if (min.getX() > vertices[i])	min.setX(vertices[i]);
+		if (min.getY() > vertices[i+1])	min.setY(vertices[i+1]);
+		if (min.getZ() > vertices[i+2])	min.setZ(vertices[i+2]);
+
+		if (max.getX() < vertices[i])	max.setX(vertices[i]);
+		if (max.getY() < vertices[i+1])	max.setY(vertices[i+1]);
+		if (max.getZ() < vertices[i+2])	max.setZ(vertices[i+2]);
+	}
+}
+
+
 void Object::DrawObject()
 {
 	// Draw the scene
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glNormalPointer(GL_FLOAT, 0, normals.data());
-	glTexCoordPointer(3, GL_FLOAT, 0, texcoords.data());
-	glVertexPointer(3, GL_FLOAT, 0, vertices.data());
+	//glEnableClientState(GL_NORMAL_ARRAY);
+	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	//glEnableClientState(GL_VERTEX_ARRAY);
+	//glNormalPointer(GL_FLOAT, 0, normals.data());
+	//glTexCoordPointer(3, GL_FLOAT, 0, texcoords.data());
+	//glVertexPointer(3, GL_FLOAT, 0, vertices.data());
 
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
+	//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
+	//glDisableClientState(GL_VERTEX_ARRAY);
+	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	//glDisableClientState(GL_NORMAL_ARRAY);
+
+	//cout << texcoords.size() << " " << normals.size() << " " << vertices.size() << " " << indices.size() << endl;
+
+	glBegin(GL_TRIANGLES);
+	for (int i = 0; i < indices.size(); i++)
+	{ 
+		glTexCoord3f(texcoords[i*3], texcoords[i*3 + 1], texcoords[i*3 + 2]);
+		glNormal3f(normals[i*3], normals[i*3 + 1], normals[i*3 + 2]);
+		glVertex3f(vertices[i*3], vertices[i*3 +  1], vertices[i*3 + 2]);
+	}
+	glEnd();
+
 }

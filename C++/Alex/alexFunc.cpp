@@ -1,6 +1,6 @@
 #include "alexFunc.h"
 #include "functions.h"
-#include <SOIL.h>
+//#include "Terrain.h"
 #include <iostream>
 
 using namespace std;
@@ -10,7 +10,7 @@ static float zoomFactor=1.0;
 GLdouble move_x=5.0,
 	move_y=5.0,
 	move_z=0,
-	max_angle = 70.0,
+	max_angle = 50.0,
 	min_angle = 0;
 
 const int window_width = 800,
@@ -18,19 +18,28 @@ const int window_width = 800,
 
 
 
+
+int doink				= 0;
+int zoink				= 0;
+int steps				= 250;
+int deSpeed				= 25;
+int reSpeed				= -25;
+
 GLint midWindowX = window_width  / 2;         // Middle of the window horizontally
 GLint midWindowY = window_height / 2;         // Middle of the window vertically
 
 GLfloat translateX = 0.0f;
 GLfloat translateY= 0.0f;
+GLfloat heightmapX = 150.0f;
+GLfloat heightmapY = 150.0f;
 GLfloat arrowAngle = 0.0f;
 
 
 GLfloat fieldOfView = 45.0f;                 // Define our field of view (i.e. how quickly foreshortening occurs)
 GLfloat near        = 1.0f;                  // The near (Z Axis) point of our viewing frustrum (default 1.0f)
-GLfloat far         = 1500.0f;				// The far  (Z Axis) point of our viewing frustrum (default 1500.0f)
+GLfloat far         = 7500.0f;				// The far  (Z Axis) point of our viewing frustrum (default 1500.0f)
 
-GLfloat movementSpeedFactor = 1.0f;
+GLfloat movementSpeedFactor = 5.0f;
 
 // Camera rotation
 GLfloat camXRot = 0.0f;
@@ -54,6 +63,8 @@ GLfloat camZSpeed = 0.0f;
 GLfloat fireAngle = 0.0f;
 GLfloat ballistaAngle = 0.0f;
 GLfloat temp =0.0f;
+double ArrowSpeed = 1.0;
+float snurr =0.0f;
 
 // Hoding any keys down?
 bool holdingForward     = false;
@@ -65,18 +76,25 @@ bool holdingUPARROW		= false;
 bool holdingDOWNARROW	= false;
 bool holdingLEFTARROW	= false;
 bool holdingRIGHTARROW	= false;
+bool collision			= false;
+bool deformBow			= false;
+bool reformBow			= false;
 double pushtime			= 0;
+double old_time			= 0;
+double arrowHeight		= 0;
+double _terrainHeight	= 0;
+
+double 	worldarrowX =0,
+		worldarrowY=0;
 
 
+float temp1 = 0.0f;
 
 
 
 void setProjectionMatrix ()
 {
-	//glMatrixMode(GL_PROJECTION);
-	//glLoadIdentity();
-	//float aspect_ratio = ((float)window_height) / window_width;
-	//glFrustum(.5, -.5, -.5 * aspect_ratio, .5 * aspect_ratio, 1, 50);
+
 	
 	
 	glMatrixMode(GL_PROJECTION);
@@ -103,45 +121,66 @@ void setViewMatrix ()
 
 void calculate_Arrow(double current_time)
 {
-	
 	double time = current_time - pushtime;
 	double timeOfFlight = getTimeOfFlight();
+	
+	//cout << " tid " << time << endl;
+	//cout << "timeofflight" << timeOfFlight << endl;
+	//cout << "Kollision ? " << getCollision() << endl;
 
-	if(firetheballista==true && time < timeOfFlight)
+	if(time < timeOfFlight && !getCollision())
 	{
+		//cout << "HERP" << endl;
 		arrowAngle = getarrowAngle(time);
 		translateX = getArrowposX(time);
 		translateY = getArrowposY(time);
+		heightmapX = getArrowposHeightmapX(time, getBallistaAngle());
+		heightmapY = getArrowposHeightmapY(time,getBallistaAngle());
+		worldarrowX= getArrowposWorldX(time, getBallistaAngle());
+		worldarrowY=getArrowposWorldY(time, getBallistaAngle());
+		old_time = time;
 	}
-	else
+	else if(getCollision())
 	{
-		firetheballista = false;
+		//cout << "DERP DERP DERP" << endl;
+		translateX = getArrowposX(old_time);
+		translateY = getArrowposY(old_time);
+		heightmapX = heightmapX;
+		heightmapY = heightmapY;
 	}
+	
+}
 
+void tempScale(float scale)
+{
+	temp1 = scale;
+}
+float getScale()
+{
+	return temp1;
 }
 
 GLfloat getArrowRotation()
 {
 
-	if(firetheballista == false) 
-	{
-		//GLfloat temp = getFireAngle();
-		return getFireAngle();
-	}
-
 		return getArrowAngle();
-
 
 }
 
 void MOVE_ARROW()
-{		
-	glTranslatef(getArrowXpos(),getArrowYpos(),0);  
-	
-	if(firetheballista == true)
-	{
+{	
+
+		glTranslatef(getArrowXpos(),getArrowYpos(),0);  
 		glRotatef(getArrowRotation(),0,0,1);
-	}
+		glRotatef(snurr,1,0,0);
+
+		if(Fired() && !getCollision())
+		snurr +=0.5f;
+	
+}
+void STOP_ARROW()
+{
+	//gltranslatef(0,0,0);
 }
 
 
@@ -152,12 +191,15 @@ GLfloat getArrowAngle()
 
 GLfloat getArrowXpos()
 {
-	return translateX;
+	//cout << translateX << endl;
+	return translateX*ArrowSpeed;
+
 }
 GLfloat getArrowYpos()
 {
-	return translateY;
+	return translateY*ArrowSpeed;
 }
+
 
 void moveCamera()
 {
@@ -167,13 +209,50 @@ void moveCamera()
 }
 
 
+Object moveBow(Object objStuff)
+{
+	if(deformBow)
+		doink = steps/deSpeed;
+
+	if(reformBow)
+		zoink = abs(steps/reSpeed);
+
+	if(doink != 0)
+	{
+		doink--;
+		objStuff = deformBowfunc(objStuff, deSpeed);
+	}
+
+		if(zoink != 0)
+	{
+		zoink--;
+		objStuff = deformBowfunc(objStuff, reSpeed);
+	}
+
+	return objStuff;
+}
+
+Object deformBowfunc(Object objStuff,int speed)
+{
+	vector<GLfloat> temp = objStuff.getVertices();
+
+	for (int i = 0; i < temp.size(); i++)
+	{
+		if (i % 3 == 2)
+		{
+			temp[i] =  temp[i] - pow((double)temp[i - 2] , 2)/(10000/speed);
+		}
+	}
+	objStuff.setVertices(temp);
+	return objStuff;
+}
+
 // Function to deal with mouse position changes, called whenever the mouse cursorm moves
 void handleMouseMove(int mouseX, int mouseY)
 {
     GLfloat vertMouseSensitivity  = 10.0f;
     GLfloat horizMouseSensitivity = 10.0f;
  
-    //cout << "Mouse cursor is at position (" << mouseX << ", " << mouseY << endl;
  
     int horizMovement = mouseX - midWindowX;
     int vertMovement  = mouseY - midWindowY;
@@ -306,33 +385,48 @@ void calculateCameraMovement()
     }
 }
 
-// Function to draw a grid of lines
-void drawGround()
+//// Function to draw a grid of lines
+//void drawGround()
+//{
+//    GLfloat extent      = 600.0f; // How far on the Z-Axis and X-Axis the ground extends
+//    GLfloat stepSize    = 20.0f;  // The size of the separation between points
+//    GLfloat groundLevel = -50.0f;   // Where on the Y-Axis the ground is drawn
+// 
+//    // Set colour to white
+//    glColor3ub(255, 255, 255);
+// 
+//    // Draw our ground grid
+//    glBegin(GL_LINES);
+//    for (GLint loop = -extent; loop < extent; loop += stepSize)
+//    {
+//        // Draw lines along Z-Axis
+//        glVertex3f(loop, groundLevel,  extent);
+//        glVertex3f(loop, groundLevel, -extent);
+// 
+//        // Draw lines across X-Axis
+//        glVertex3f(-extent, groundLevel, loop);
+//        glVertex3f(extent,  groundLevel, loop);
+//    }
+//    glEnd();
+// 
+//}
+
+//float heightmapPosX(float r,float theta)
+//{
+//	return 30*r*cos(theta);
+//
+//}
+//float heightmapPosY(float r,double theta)
+//{
+//	return 30*r*sin(theta);
+//
+//}
+
+
+double getArrowSpeed()
 {
-    GLfloat extent      = 600.0f; // How far on the Z-Axis and X-Axis the ground extends
-    GLfloat stepSize    = 20.0f;  // The size of the separation between points
-    GLfloat groundLevel = -50.0f;   // Where on the Y-Axis the ground is drawn
- 
-    // Set colour to white
-    glColor3ub(255, 255, 255);
- 
-    // Draw our ground grid
-    glBegin(GL_LINES);
-    for (GLint loop = -extent; loop < extent; loop += stepSize)
-    {
-        // Draw lines along Z-Axis
-        glVertex3f(loop, groundLevel,  extent);
-        glVertex3f(loop, groundLevel, -extent);
- 
-        // Draw lines across X-Axis
-        glVertex3f(-extent, groundLevel, loop);
-        glVertex3f(extent,  groundLevel, loop);
-    }
-    glEnd();
- 
+	return ArrowSpeed;
 }
-
-
 
 //Flytta kameran
 void Move_Camera()
@@ -359,10 +453,12 @@ void calculate_BallistaAngle()
 	if(holdingLEFTARROW == true && firetheballista == false)
 	{
 		ballistaAngle -= 1.0;
+		cout << "ballista angle " << ballistaAngle << endl;
 	}
 	if(holdingRIGHTARROW == true && firetheballista == false)
 	{
 		ballistaAngle += 1.0;
+		cout << "ballista angle " << ballistaAngle << endl;
 	}
 
 
@@ -416,7 +512,30 @@ void handleKeypress(int theKey, int theAction)
 		case 'F':
 			firetheballista = true;
 			pushtime = glfwGetTime();
+			Resetbow();
 			Arrowpos();
+			reformBow = true;
+			break;
+
+		case 'R':
+			deformBow = true;
+			collision = false;
+			firetheballista= false;
+			pushtime = 0;
+			translateX = 0.0f;
+			translateY = 0.0f;
+			arrowHeight = 0.0f;
+			_terrainHeight = 99999.0f;
+			cout << translateX << endl;
+			break;
+
+		case 'O':
+			deformBow = true;
+			break;
+
+
+		case 'P':
+			reformBow = true;
 			break;
 
 		case GLFW_KEY_UP:
@@ -462,6 +581,25 @@ void handleKeypress(int theKey, int theAction)
         case 'D':
             holdingRightStrafe = false;
             break;
+
+
+		case 'R':
+			deformBow = false;
+			break;
+
+		case 'F':
+			reformBow = false;
+			break;
+
+
+		case 'O':
+			deformBow = false;
+			break;
+			
+		case 'P':
+			reformBow = false;
+			break;
+			
 
 			
 		case GLFW_KEY_UP:
@@ -512,4 +650,42 @@ GLfloat getCamXRot()
 GLfloat getCamYRot()
 {
 	return camYRot;
+}
+
+void CheckCollision(Terrain* _terrain,double current_time, float scale)
+{
+	_terrainHeight = _terrain->getHeight(heightmapX,heightmapY)*scale;
+	arrowHeight = (getArrowYpos())/**scale*/;
+
+	cout <<" X   Y   " << heightmapX<<" ,  "<<heightmapY<< endl;
+	
+
+	double time = current_time - pushtime;
+
+	if(_terrainHeight>arrowHeight && pushtime != current_time)
+	{		
+		collision = true;
+		cout << "NEIN" << endl;
+	}
+	if(
+
+		
+}
+bool getCollision(){
+	return collision;
+}
+
+void Resetbow()
+{
+
+}
+
+bool getDeform()
+{
+	return deformBow;
+}
+
+bool getReform()
+{
+	return reformBow;
 }

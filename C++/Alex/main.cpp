@@ -1,58 +1,63 @@
 #define WIN32_LEAN_AND_MEAN
 #define BITMAP_ID 0x4D42
 
-
 #include <GL/glfw.h>
 #include <stdlib.h>
-#include <SOIL.h>
 #include <vector>
 #include <cmath>
 #include <stdio.h>
 #include "alexFunc.h"
 #include "functions.h"
-#include "Object.h"
-
-
-/////////
-
-
+//#include "Object.h"
 #include <iostream>
 #include <windows.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
-
-#include "Terrain.h"
+//#include "Terrain.h"
+#include "skybox.h"
 
 void Init(void);
 void Shut_Down(int return_code);
 void Main_Loop(void);
-void Draw_Square(float red, float green, float blue);
 void Draw(void);
 void LIGHT(void);
+void FOG(void);
+float getScale();
+float scaleH=0.0f;
 
 using namespace std;
 
-string strArrow = "Data\bigArrow.obj";
-string strBallista = "Data\ballista.obj";
-string strBorg = "Data\Borg.obj";
-char texname[] = "Data\johda2.tga";
+string strArrow = "Data/Arrow_correct.obj";
+string strBallista = "Data/ballista_woBow.obj";
+string strBow = "Data/ballista_onlyBow.obj";
+string strBorg = "Data/old_castle.obj";
+string strMan = "Data/swordman.obj";
 
 Object objArrow(strArrow);
 Object objBallista(strBallista);
 Object objBorg(strBorg);
+Object objBow(strBow);
+Object objSwordman(strMan);
+
 
 int frames = 0;
+float roll;
 double t0 = 0.0;
 char titlestring[200];
 double current_time = 0.0;
+float _heightTranslate = 0.0;
 
-GLuint	texture[1];
+GLuint textureTest[6];
  
+GLfloat	fogColor[4] = {0.5f,0.5f,0.5f,1.0f};
+
 vector<GLfloat> vertices;
 vector<GLfloat> texcoords;
 vector<GLfloat> normals;
 vector<GLuint> indices;
 
+Terrain* _terrain;
+GLUquadric *myQuad;
 
 //Loads a terrain from a heightmap.  The heights of the terrain range from
 //-height / 2 to height / 2.
@@ -63,7 +68,7 @@ Terrain* loadTerrain(const char* filename, float height) {
 		for(int x = 0; x < image->width; x++) {
 			unsigned char color =
 				(unsigned char)image->pixels[3 * (y * image->width + x)];
-			float h = height * ((color / 255.0f) - 0.5f);
+			float h = height * ((color / 255.0f) /*- 0.5f*/);
 			t->setHeight(x, y, h);
 		}
 	}
@@ -136,81 +141,20 @@ unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER *bitmapInfoHeader
 	return bitmapImage;
 }
 
-float _angle = 60.0f;
-Terrain* _terrain;
-BITMAPINFOHEADER	landInfo;
-unsigned char*       landTexture;
-unsigned int		   land;
-
-
 void cleanup() {
 	delete _terrain;
 }
 
-int LoadGLTextures()
-{
-	/* load an image file directly as a new OpenGL texture */
-	texture[0] = SOIL_load_OGL_texture
-		(
-		texname,
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_INVERT_Y
-		);
-
-	if(texture[0] == 0)
-		Shut_Down(1);
-
-	// Typical Texture Generation Using Data From The Bitmap
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-
-	return true;
-}
-
-bool LoadTextures()
-{
-	// load the land texture data
-	landTexture = LoadBitmapFile("Terrain2.bmp", &landInfo);
-	if (!landTexture)
-		return false;
-
-	// generate the land texture as a mipmap
-	glGenTextures(1, &land);                  
-	glBindTexture(GL_TEXTURE_2D, land);       
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, landInfo.biHeight, landInfo.biWidth, GL_RGB, GL_UNSIGNED_BYTE, landTexture);
-
-	return true;
-}
-
-void initRendering() {
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_NORMALIZE);
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_TEXTURE_2D);
-	//LoadTextures();
-}
-
-
 int main(void)
 {
 	Init();
-	//LoadGLTextures();
 	Main_Loop();
 	Shut_Down(0);
 }
 
-
 void showFPS() {
 
-    double t, fps;
-    
+    double t, fps;    
     // Get current time
     t = glfwGetTime();  // Gets number of seconds since glfwInit()
     // If one second has passed, or if this is the very first frame
@@ -224,12 +168,11 @@ void showFPS() {
     }
     frames ++;
 }
-
  
 void Init(void)
 {
-	const int window_width = 800,
-	          window_height = 600;
+	const int window_width = 1200,
+	          window_height = 800;
 	
 	if (!glfwInit())
 	  Shut_Down(1);
@@ -238,34 +181,67 @@ void Init(void)
 	if (!glfwOpenWindow(window_width, window_height, 5, 6, 5, 0, 0, 0, GLFW_WINDOW))
 	  Shut_Down(1);
 	
+
+
+	objBorg.createBoundingBox();
+
+
+
+
 	glfwDisable(GLFW_MOUSE_CURSOR); // Hide the mouse cursor
-	glfwSetWindowTitle("TEST LOL");
+	//glfwSetWindowTitle("TEST LOL");
 	
 	setProjectionMatrix ();
 	setViewMatrix();
+	myQuad = gluNewQuadric ();	
 
-	LIGHT();
-
-	initRendering();
 	_terrain = loadTerrain("Data/heightmap2.bmp", 20);
-
+	LIGHT(); 
+	glEnable(GL_COLOR_MATERIAL);
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
   	glEnable(GL_TEXTURE_2D);							// Enable Texture Mapping ( NEW )
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);				// Black Background
-
 	glClearDepth(1.0f);									// Depth Buffer Setup
 	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
+	glEnable(GL_CULL_FACE);								// Do not draw polygons facing away from us
 
-    //glEnable(GL_CULL_FACE); // Do not draw polygons facing away from us
- 
-    glLineWidth(2.0f);			// Set a 'chunky' line width
+	//Skapa texturer
+	glGenTextures(6, textureTest);
+	glBindTexture(GL_TEXTURE_2D, textureTest[0]); // Activate first texture
+    glfwLoadTexture2D("Data/UV_2.tga", GLFW_BUILD_MIPMAPS_BIT); // Load image
+    glBindTexture(GL_TEXTURE_2D, textureTest[1]); // Activate second texture
+    glfwLoadTexture2D("Data/UV_old_castle_TAG.tga", GLFW_BUILD_MIPMAPS_BIT);
+	glBindTexture(GL_TEXTURE_2D, textureTest[2]); // Activate second texture
+    glfwLoadTexture2D("Data/grass.tga", GLFW_BUILD_MIPMAPS_BIT);
+	glBindTexture(GL_TEXTURE_2D, textureTest[3]);
+	glfwLoadTexture2D("Data/UV_pil.tga", GLFW_BUILD_MIPMAPS_BIT);	
+	glBindTexture(GL_TEXTURE_2D, textureTest[4]);
+	glfwLoadTexture2D("Data/sky.tga", GLFW_BUILD_MIPMAPS_BIT);	
+	glBindTexture(GL_TEXTURE_2D, textureTest[5]);
+	glfwLoadTexture2D("Data/swordman.tga", GLFW_BUILD_MIPMAPS_BIT);	
 
-	// Ladda in objekt
-	//parseObj(objname, vertices, texcoords, normals, indices);
+	
+
+	//FOG();
 
 
+
+}
+
+void FOG()
+{	
+	glFogi(GL_FOG_MODE, GL_LINEAR);			// Fog Mode
+	glFogfv(GL_FOG_COLOR, fogColor);		// Set Fog Color
+	glFogf(GL_FOG_DENSITY, 0.005f);			// How Dense Will The Fog Be
+	glHint(GL_FOG_HINT, GL_NICEST);			// Fog Hint Value
+	glFogf(GL_FOG_START, 100.0f);			// Fog Start Depth
+	glFogf(GL_FOG_END, 1500.0f);				// Fog End Depth
+	glEnable(GL_FOG);						// Enables GL_FOG
 }
  
 void Shut_Down(int return_code)
@@ -278,60 +254,73 @@ void Main_Loop(void)
 {
 	// the time of the previous frame
 	double old_time = glfwGetTime();
-
 	// Specify the function which should execute when a key is pressed or released
 	glfwSetKeyCallback(handleKeypress);
 
 	// Specify the function which should execute when the mouse is moved
 	glfwSetMousePosCallback(handleMouseMove);
+	
+	scaleH = 5.0f; /*2000.0f / max(_terrain->width() - 1, _terrain->length() - 1);*/
+	_heightTranslate = _terrain->getHeight(150,150);
+	_heightTranslate =_heightTranslate* scaleH;
+
+	tempScale(scaleH);
 
 
-  // this just loops as long as the program runs
-  while(1)
+
+  while(1)  // This just loops as long as the program runs
   {	
 	  double current_time = glfwGetTime();
-
 	  showFPS();
 
     // clear the buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // draw the figure
-	Draw();
 
-
-	// Calculate our camera movement
-	calculateCameraMovement();
-
-	calculate_BallistaAngle();
+	glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
 	
 
+		Draw(); // Draw everything
+
+	glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+		//Kolla pilen mot heightmap
+	if( Fired())
+	{
+		calculate_Arrow(current_time);
+		CheckCollision(_terrain, current_time, scaleH);
+		
+	}
+	
+	// Calculate our camera movement
+	calculateCameraMovement();
+	calculate_BallistaAngle();
 	setFireAngle(getFireAngle());
 
-	// Move our camera
-	moveCamera();
+	objBow = moveBow(objBow);//Kollar om bågen spänns
+	moveCamera(); // Move our camera
 
-	calculate_Arrow(current_time);
-
-	// swap back and front buffers
-	glfwSwapBuffers();
+	
+	glfwSwapBuffers(); // swap back and front buffers
   }
 }
 
 void LIGHT()
 {
-	GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
-	
-	GLfloat lightColor0[] = {0.6f, 0.6f, 0.6f, 1.0f};
-	GLfloat lightPos0[] = {-0.0f, 20.0f, 0.1f, 0.0f};
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
+	//GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f};
+	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
+	//GLfloat lightColor0[] = {0.6f, 0.6f, 0.6f, 0.0f};
+	//GLfloat lightPos0[] = {-0.0f, 50.0f, 0.0f, 0.0f};
+	////glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
+	//glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
+	//glLightfv(GL_LIGHT0, GL_AMBIENT_AND_DIFFUSE, lightColor0);
+	 GLfloat lightpos[4]={0.0f, 0.0f, 0.0f, 5.0f};
+	glLightfv(GL_LIGHT0, GL_POSITION,lightpos);
 }
-void DrawMap()
-{
 
-	
-	float scale = 200.0f / max(_terrain->width() - 1, _terrain->length() - 1);
+void DrawMap()
+{	
+	float scale = 5.0f; /*/ max(_terrain->width() - 1, _terrain->length() - 1);*/
 	glScalef(scale, scale, scale);
 	glTranslatef(-(float)(_terrain->width() - 1) / 2,
 				 0.0f,
@@ -358,87 +347,33 @@ void DrawMap()
 	}
 }
 
-void DrawScene ()
+void SkyBox()
 {
-
-	// Draw the scene
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glNormalPointer(GL_FLOAT, 0, normals.data());
-	glTexCoordPointer(3, GL_FLOAT, 0, texcoords.data());
-	glVertexPointer(3, GL_FLOAT, 0, vertices.data());
-
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
-	//glDrawArrays(GL_TRIANGLES, 0, (vertices.size()));
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisable(GL_DEPTH);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(1,1,1,1);
+	//glColor4f(0,0,1,1);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureTest[4]);
+	glTranslatef(0,0,0);
+	glRotatef(90,1,0,1);
+	gluSphere(myQuad,3500,50,50);
+	//glRotatef(roll/10, 0.2, 1, 0);
+	//glColor4f(1, 1, 1, cos(roll/12));
+	//gluSphere(myQuad, 55000-0.8, 50, 50);
+	glEnable(GL_DEPTH);
+	glDisable(GL_BLEND);
+	roll+=0.002f;
+	glEnable(GL_LIGHTING);
 }
-
-
-void Draw_3DSquare()
-{
-
-	GLfloat vertices[] = {
-		-1.0000,	0.0000,	 1.0000,
-		-1.0000,	0.0000,	 -1.0000,
-		1.0000,	0.0000,	 -1.0000,
-		1.0000,	0.0000,	 1.0000,
-		-1.0000,	2.0000,	 1.0000,
-		1.0000,	2.0000,	 1.0000,
-		1.0000,	2.0000,	 -1.0000,
-		-1.0000,	2.0000,	 -1.0000};
-
-
-
-		GLubyte indices[] = {
-			0, 1, 2, 3, 
-			4, 5, 6, 7, 
-			0, 3, 5, 4,
-			3, 2, 6, 5,
-			2, 1, 7, 6, 
-			1, 0, 4, 7}; 
-
-			GLfloat normals[] = {
-				0.0000, -1.0000, -0.0000,
-				0.0000, 1.0000, -0.0000,
-				0.0000, 0.0000, 1.0000,
-				1.0000, 0.0000, -0.0000,
-				0.0000, 0.0000, -1.0000,
-				-1.0000, 0.0000, -0.0000};
-
-
-				GLfloat texcoord[] = {
-					1,0,	1,1,	0,1,	0,0,
-					0,0,	1,0,	1,1,	0,1,
-					0,0,	1,0,	1,1,	0,1,
-					0,0,	1,0,	1,1,	0,1,
-					0,0,	1,0,	1,1,	0,1,
-					0,0,	1,0,	1,1,	0,1,};
-
-					glEnableClientState(GL_NORMAL_ARRAY);
-					glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-					glEnableClientState(GL_VERTEX_ARRAY);
-					glNormalPointer(GL_FLOAT,0,normals);
-					glTexCoordPointer(2, GL_FLOAT, 0, texcoord);
-					glVertexPointer(3, GL_FLOAT, 0, vertices);
-
-					glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, indices);
-
-					glDisableClientState(GL_VERTEX_ARRAY);
-					glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-					glDisableClientState(GL_NORMAL_ARRAY);
-
-
-}
-
  
 void Draw(void)
 {
 	 // Clear the screen and depth buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+	
 	
     // Reset the matrix
     glMatrixMode(GL_MODELVIEW);
@@ -446,26 +381,43 @@ void Draw(void)
 
 	Move_Camera();
 
-
-		
-	//Scengraf
-
+	// ----------- SCENGRAF -----------
 	glPushMatrix();
+	glPushMatrix();
+
+	//glBindTexture(GL_TEXTURE_2D, textureTest[3]);
+	glScalef(-1.0f,-1.0f,-1.0f);
+	glColor3f(0.0f,0.0f,0.0f);
+		SkyBox();
+		glPopMatrix();
 
 		//Ballista
 		glPushMatrix();	
+
 			//Matrismultiplikationer som rör Ballistan här!
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-			glTranslatef(0.0f, 0.0f, 0.0f);
-			glScalef(0.2f, 0.2f, 0.2f);
+			rotateBallista();
+			glTranslatef(0.0f, _heightTranslate, 0.0f);
+			glBindTexture(GL_TEXTURE_2D, textureTest[0]);
+			//glScalef(0.25f,0.25f,0.25f);
 			objBallista.DrawObject();
-		
+			glPushMatrix();
+			objBow.DrawObject();
+			glPopMatrix();
 			//Arrow
 			glPushMatrix();		
 				//Matrismultiplikationer som rör Pilen här!
+			glRotatef(270.0f,0,1,0);
+			if(!getCollision()&& !Fired())
+			{
+				glTranslatef(-9.0f,1.5f,0.4f);
+				glRotatef(6.0f,0,0,1);
+			}
+			else
+			{
+				//glTranslatef(0.0f,20.0f,0.0f);
 				MOVE_ARROW();
-				glTranslatef(0.0f, 0.0f, 0.0f);		
+			}
+				glBindTexture(GL_TEXTURE_2D, textureTest[3]);
 				objArrow.DrawObject();			
 			glPopMatrix();
 		glPopMatrix();
@@ -473,24 +425,29 @@ void Draw(void)
 		//Borg	
 		glPushMatrix();
 			//Matrismultiplikationer som rör Borgen här!	
-			glColor3f(0.0f, 0.0f, 1.0f);
-			glTranslatef(0.0f, 0.0f, 50.0f);
-			glScalef(5.0f, 5.0f, 5.0f);
-			glRotatef(0.0f, 0.0f, 1.0f, 0.0f);		
+			glTranslatef(-100.0f, _heightTranslate+15, 400.0f);
+			glRotatef(45.0f,0,1,0);
+			glScalef(15.0f,15.0f, 15.0f);
+			glBindTexture(GL_TEXTURE_2D, textureTest[1]);
 			objBorg.DrawObject();		
 		glPopMatrix();
-
+		
+		glPushMatrix();
+			glTranslatef(5,0,5);
+			glRotatef(35,0,1,0);
+			glScalef(0.015f,0.015f,0.015f);
+			glBindTexture(GL_TEXTURE_2D, textureTest[5]);
+			objSwordman.DrawObject();
+		glPopMatrix();
 
 		//Terräng och "markplan"
 		//Matrismultiplikationer som rör Heightmap här!	
-		glColor3f(0.0f, 1.0f, 0.0f);
-		glRotatef(0.0f, 0.0f, 1.0f, 0.0f);	
+		glBindTexture(GL_TEXTURE_2D, textureTest[2]);
+		glColor3f(0.0f,1.0f,0.0);
 		DrawMap();
-		drawGround();
 	glPopMatrix();
+
  
+
     // ----- Stop Drawing Stuff! ------
- 
-
 }
-

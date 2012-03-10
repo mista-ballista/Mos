@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include "functions.h"
+#include "alexFunc.h"
 
 using namespace std;
 
@@ -49,12 +50,17 @@ int old_index = 0.0;
 
 
 
+void ResetIndex()
+{
+	old_index = 0.0;
+}
+
 void setFireAngle(float _tempVinkel)
 {
 	_vinkel = _tempVinkel*TO_RADS;
 
 }
-double getFireAngle()
+double getFireAngle1()
 {
 	return _vinkel;
 }
@@ -66,15 +72,13 @@ float getarrowAngle(float time)
 	int index = time / _steglangd;
 	if(index < y.size())
 	{
-	 angle = _vinkel*TO_DEG - (y.at(index)-y.at(old_index)/(x.at(index)-x.at(old_index)));
+	 angle = ((y.at(index)-y.at(old_index))/(x.at(index)-x.at(old_index)))*TO_DEG;
 	}
-	else
-	{
-		 angle = -_vinkel*TO_DEG;
-	}
-	return angle;
 
 	old_index= index;
+	return angle;
+
+
 
 }
 
@@ -95,11 +99,17 @@ float  rsum(float a,float b,int n)
 float force(float _drawLength)
 {
 	//Deklarrera variabler
-    _l = 0.5f;
-	_halfHandle = 0.1f;
-	_mLimb = 0.093f; 
-	_kappa = 620.0f;
-	_mArrow = 0.025f;
+ //   _l = 0.5f;
+	//_halfHandle = 0.1f;
+	//_mLimb = 0.093f; 
+	//_kappa = 620.0f;
+	//_mArrow = 0.025f;
+
+	_l = 3.0f;
+	_halfHandle = 0.5f;
+	_mLimb = 14.0f; 
+	_kappa = 3000.0f;
+	_mArrow = 5.0f;
 
 	//KOD!
 	_x0 = _l * sin(_theta0);
@@ -133,6 +143,11 @@ float force(float _drawLength)
     return _f;
 }
 
+void Reload()
+{
+
+}
+
 void Arrowpos()
 {
 
@@ -143,14 +158,20 @@ void Arrowpos()
 	_vArrowAngle.clear();
 	_timeOfFlight = 0;
 
-	_l				= 0.5f; /*Lemmarnas längd*/
-	_mArrow			= 0.025f; /*Massan på pilen*/
+
+	//_l				= 0.5f; /*Lemmarnas längd*/
+	//_mArrow			= 0.025f; /*Massan på pilen*/
+
+	_l				= 3.0f; /*Lemmarnas längd*/
+	_mArrow			= 5.0f; /*Massan på pilen*/
+
+
 	_x0				= _l*sin(_theta0); /*Stränghöjd i startläge*/
 	g				= 9.82f; /*gravitation*/
 	//_vinkel= (45.0f*Pi/180.0f); /*utgångsvinkel*/
-	_vinkel			=getFireAngle();
-	_BallistaHeight	= 1.0f; /*Start höjd*/
-	_totalDrag		= 0.7f;
+	_vinkel			=getFireAngle1();
+	_BallistaHeight	= 5.0f; /*Start höjd*/
+	_totalDrag		= 5.0f;
 	_pullBack		= _totalDrag-_x0; /*Hur långt vi drar pilen*/
 	_work			= rsum(_pullBack,_x0,600); /*Pilens utgångshastighet när tilen dras tillbaka*/
 	
@@ -188,8 +209,8 @@ void Arrowpos()
 	}	
 
 
-	cout << "TotalDistance: "<< _totalDistance << endl;
-	cout << "Time of flight: "<< _timeOfFlight << endl;
+	//cout << "TotalDistance: "<< _totalDistance << endl;
+	//cout << "Time of flight: "<< _timeOfFlight << endl;
 }
 
 float getArrowposX(float time)
@@ -221,6 +242,33 @@ float getArrowposY(float time)
 	return ypos;
 	
 }
+
+float getArrowposHeightmapX(float time, double theta)
+{
+	float r = sqrt(pow(getArrowXpos()*getArrowSpeed(),2) + pow(getArrowYpos()*getArrowSpeed(),2));
+
+	float ret =150+(r*cos(theta))/(getScale()*getArrowSpeed());
+	return ret; 
+}
+float getArrowposHeightmapY(float time, double theta)
+{
+		float r = sqrt(pow(getArrowXpos(),2) + pow(getArrowYpos(),2));
+	return 150+(r*sin(theta))/(getScale());
+}
+
+float getArrowposWorldX(float time, double theta)
+{
+	float r = sqrt(pow(getArrowXpos(),2) + pow(getArrowYpos(),2));
+
+	return (r*cos(theta))/(getScale()); 
+}
+float getArrowposWorldY(float time, double theta)
+{
+		float r = sqrt(pow(getArrowXpos(),2) + pow(getArrowYpos(),2));
+	return (r*sin(theta))/(getScale());
+}
+
+
 
 double getTimeOfFlight()
 {
