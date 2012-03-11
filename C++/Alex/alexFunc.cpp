@@ -21,9 +21,10 @@ const int window_width = 800,
 
 int doink				= 0;
 int zoink				= 0;
-int steps				= 250;
-int deSpeed				= 25;
-int reSpeed				= -25;
+int steps				= 20;
+int deSpeed				= 1;
+int reSpeed				= -1;
+GLfloat back			= -7.0;
 
 GLint midWindowX = window_width  / 2;         // Middle of the window horizontally
 GLint midWindowY = window_height / 2;         // Middle of the window vertically
@@ -83,6 +84,7 @@ double pushtime			= 0;
 double old_time			= 0;
 double arrowHeight		= 0;
 double _terrainHeight	= 0;
+
 
 double 	worldarrowX =0,
 		worldarrowY=0;
@@ -178,9 +180,14 @@ void MOVE_ARROW()
 		snurr +=0.5f;
 	
 }
-void STOP_ARROW()
+void BACKA_ARROW()
 {
-	//gltranslatef(0,0,0);
+	for(int i=0; i<5; i++)
+	{
+		float t =-0.1*i;
+		glTranslatef(t,1.5f,0.4f);
+	}
+	
 }
 
 
@@ -208,14 +215,25 @@ void moveCamera()
     camZPos += camZSpeed;
 }
 
+void setDoink()
+{
+	doink = steps/deSpeed;
+}
+
 
 Object moveBow(Object objStuff)
 {
-	if(deformBow)
-		doink = steps/deSpeed;
+	//if(deformBow)
+	//{
+	//	doink = steps/deSpeed;
+	//}
 
 	if(reformBow)
-		zoink = abs(steps/reSpeed);
+	{
+		zoink = abs(steps/reSpeed) * (getdrag() - 3) / 0.5;
+		cout << "zoink " << zoink << endl;
+					Resetbow();
+	}
 
 	if(doink != 0)
 	{
@@ -223,7 +241,7 @@ Object moveBow(Object objStuff)
 		objStuff = deformBowfunc(objStuff, deSpeed);
 	}
 
-		if(zoink != 0)
+	while(zoink != 0)
 	{
 		zoink--;
 		objStuff = deformBowfunc(objStuff, reSpeed);
@@ -385,42 +403,6 @@ void calculateCameraMovement()
     }
 }
 
-//// Function to draw a grid of lines
-//void drawGround()
-//{
-//    GLfloat extent      = 600.0f; // How far on the Z-Axis and X-Axis the ground extends
-//    GLfloat stepSize    = 20.0f;  // The size of the separation between points
-//    GLfloat groundLevel = -50.0f;   // Where on the Y-Axis the ground is drawn
-// 
-//    // Set colour to white
-//    glColor3ub(255, 255, 255);
-// 
-//    // Draw our ground grid
-//    glBegin(GL_LINES);
-//    for (GLint loop = -extent; loop < extent; loop += stepSize)
-//    {
-//        // Draw lines along Z-Axis
-//        glVertex3f(loop, groundLevel,  extent);
-//        glVertex3f(loop, groundLevel, -extent);
-// 
-//        // Draw lines across X-Axis
-//        glVertex3f(-extent, groundLevel, loop);
-//        glVertex3f(extent,  groundLevel, loop);
-//    }
-//    glEnd();
-// 
-//}
-
-//float heightmapPosX(float r,float theta)
-//{
-//	return 30*r*cos(theta);
-//
-//}
-//float heightmapPosY(float r,double theta)
-//{
-//	return 30*r*sin(theta);
-//
-//}
 
 
 double getArrowSpeed()
@@ -512,21 +494,30 @@ void handleKeypress(int theKey, int theAction)
 		case 'F':
 			firetheballista = true;
 			pushtime = glfwGetTime();
-			Resetbow();
+			
 			Arrowpos();
 			reformBow = true;
+			resetArrow();
+			//Resetbow();
 			break;
 
 		case 'R':
-			deformBow = true;
-			collision = false;
-			firetheballista= false;
-			pushtime = 0;
-			translateX = 0.0f;
-			translateY = 0.0f;
-			arrowHeight = 0.0f;
-			_terrainHeight = 99999.0f;
-			cout << translateX << endl;
+			if(getdrag() < 5)
+			{
+				setdrag();
+				setArrowBack();
+				/*deformBow = true;*/
+				setDoink();
+				collision = false;
+				firetheballista= false;
+				ResetIndex();
+				pushtime = 0;
+				translateX = 0.0f;
+				translateY = 0.0f;
+				arrowHeight = 0.0f;
+				_terrainHeight = 99999.0f;
+			}
+
 			break;
 
 		case 'O':
@@ -646,18 +637,18 @@ GLfloat getCamXRot()
 {
 	return camXRot;
 }
-
+					
 GLfloat getCamYRot()
 {
 	return camYRot;
 }
 
-void CheckCollision(Terrain* _terrain,double current_time, float scale)
+void CheckCollision(Terrain* _terrain,double current_time, float scale, Object o)
 {
 	_terrainHeight = _terrain->getHeight(heightmapX,heightmapY)*scale;
 	arrowHeight = (getArrowYpos())/**scale*/;
 
-	cout <<" X   Y   " << heightmapX<<" ,  "<<heightmapY<< endl;
+	//cout <<" X   Y   " << heightmapX<<" ,  "<<heightmapY<< endl;
 	
 
 	double time = current_time - pushtime;
@@ -665,9 +656,14 @@ void CheckCollision(Terrain* _terrain,double current_time, float scale)
 	if(_terrainHeight>arrowHeight && pushtime != current_time)
 	{		
 		collision = true;
-		cout << "NEIN" << endl;
+		//cout << "NEIN" << endl;
 	}
-	if(
+	//cout << worldarrowX<<"     "<< o.max.getX() <<"     "<< o.min.getX() << endl;
+	//cout << worldarrowX << "    " << worldarrowY << endl;
+
+
+	if(worldarrowX<-o.max.getX() && worldarrowX>-o.min.getX() &&  worldarrowY<o.max.getZ() && worldarrowY>o.min.getZ() && getArrowYpos()<o.max.getY() && getArrowYpos()>o.min.getY())
+		collision = true;
 
 		
 }
@@ -675,10 +671,7 @@ bool getCollision(){
 	return collision;
 }
 
-void Resetbow()
-{
 
-}
 
 bool getDeform()
 {
@@ -688,4 +681,19 @@ bool getDeform()
 bool getReform()
 {
 	return reformBow;
+}
+
+GLfloat getArrowBack()
+{
+	return back;
+}
+
+void setArrowBack()
+{
+
+	 back-=0.5;
+}
+void resetArrow()
+{
+	back= -7;
 }

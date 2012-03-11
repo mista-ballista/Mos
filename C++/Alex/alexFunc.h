@@ -11,6 +11,7 @@ void moveArrow();
 GLfloat getArrowXpos();
 GLfloat getArrowYpos();
 void MOVE_ARROW();
+void BACKA_ARROW();
 
 void moveCamera();
 void handleMouseMove(int mouseX, int mouseY);
@@ -30,23 +31,26 @@ GLfloat getFireAngle();
 GLfloat getArrowRotation();
 GLfloat getArrowAngle();
 bool Fired();
-void CheckCollision(Terrain* _terrain,double current_time, float scale);
+void CheckCollision(Terrain* _terrain,double current_time, float scale, Object o);
 bool getCollision();
 void tempScale(float scale);
 float getScale();
 double getArrowSpeed();
-void Resetbow();
-
 GLfloat getCamXpos();
 GLfloat getCamYpos();
 GLfloat getCamZpos();
 GLfloat getCamXRot();
 GLfloat getCamYRot();
+GLfloat getArrowBack();
+void	setArrowBack();
+void	resetArrow();
 
 Object moveBow(Object objStuff);
 Object deformBowfunc(Object objStuff, int speed);
 bool getDeform();
 bool getReform();
+void setDoink();
+
 
 
 #endif

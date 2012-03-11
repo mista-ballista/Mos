@@ -18,5 +18,9 @@ float getArrowposHeightmapX(float time, double theta);
 void Reload();
 float getArrowposWorldX(float time, double theta);
 float getArrowposWorldY(float time, double theta);
+void setdrag();
+float getdrag();
+void Resetbow();
+
 
 #endif

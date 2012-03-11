@@ -21,6 +21,8 @@ public:
 	Object();
 	Object(string filename);
 	void DrawObject();
+	Vec3f min;
+	Vec3f max;
 
 	vector<GLfloat> getVertices()
 	{
@@ -40,7 +42,6 @@ private:
 		texcoords, 
 		normals;
 	vector<GLuint> indices;	
-	Vec3f min;
-	Vec3f max;
+
 };
 #endif Object_h

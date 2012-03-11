@@ -16,7 +16,7 @@ float dx;
 float c;
 float g;
 float _vinkel;
-float _totalDrag;
+float _totalDrag=3;
 float _pullBack;
 float _work;
 float _BallistaHeight;
@@ -48,7 +48,21 @@ vector<float> _vArrowAngle;
 float _steglangd = 0.001f;
 int old_index = 0.0;
 
+void setdrag()
+{
+	_totalDrag += 0.5;
+			cout << _totalDrag << endl;
+}
 
+void Resetbow()
+{
+	_totalDrag = 3;
+}
+
+float getdrag()
+{
+	return _totalDrag;
+}
 
 void ResetIndex()
 {
@@ -143,10 +157,6 @@ float force(float _drawLength)
     return _f;
 }
 
-void Reload()
-{
-
-}
 
 void Arrowpos()
 {
@@ -171,7 +181,7 @@ void Arrowpos()
 	//_vinkel= (45.0f*Pi/180.0f); /*utgångsvinkel*/
 	_vinkel			=getFireAngle1();
 	_BallistaHeight	= 5.0f; /*Start höjd*/
-	_totalDrag		= 5.0f;
+	//_totalDrag		= 5.0f;
 	_pullBack		= _totalDrag-_x0; /*Hur långt vi drar pilen*/
 	_work			= rsum(_pullBack,_x0,600); /*Pilens utgångshastighet när tilen dras tillbaka*/
 	
@@ -247,25 +257,25 @@ float getArrowposHeightmapX(float time, double theta)
 {
 	float r = sqrt(pow(getArrowXpos()*getArrowSpeed(),2) + pow(getArrowYpos()*getArrowSpeed(),2));
 
-	float ret =150+(r*cos(theta))/(getScale()*getArrowSpeed());
+	float ret =150+(r*cos(theta*TO_RADS))/(getScale()*getArrowSpeed());
 	return ret; 
 }
 float getArrowposHeightmapY(float time, double theta)
 {
 		float r = sqrt(pow(getArrowXpos(),2) + pow(getArrowYpos(),2));
-	return 150+(r*sin(theta))/(getScale());
+	return 150+(r*sin(theta*TO_RADS))/(getScale());
 }
 
 float getArrowposWorldX(float time, double theta)
 {
 	float r = sqrt(pow(getArrowXpos(),2) + pow(getArrowYpos(),2));
 
-	return (r*cos(theta))/(getScale()); 
+	return (r*cos(theta*TO_RADS))/(getScale()); 
 }
 float getArrowposWorldY(float time, double theta)
 {
 		float r = sqrt(pow(getArrowXpos(),2) + pow(getArrowYpos(),2));
-	return (r*sin(theta))/(getScale());
+	return (r*sin(theta*TO_RADS))/(getScale());
 }
 
 

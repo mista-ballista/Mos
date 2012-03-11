@@ -8,13 +8,12 @@
 #include <stdio.h>
 #include "alexFunc.h"
 #include "functions.h"
-//#include "Object.h"
 #include <iostream>
 #include <windows.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
-//#include "Terrain.h"
-#include "skybox.h"
+#include <time.h>
+
 
 void Init(void);
 void Shut_Down(int return_code);
@@ -22,12 +21,15 @@ void Main_Loop(void);
 void Draw(void);
 void LIGHT(void);
 void FOG(void);
+void FixaRands();
 float getScale();
 float scaleH=0.0f;
 
 using namespace std;
 
 string strArrow = "Data/Arrow_correct.obj";
+//string strArrow = "Data/swordman.obj";
+string strPalm = "Data/treee.obj";
 string strBallista = "Data/ballista_woBow.obj";
 string strBow = "Data/ballista_onlyBow.obj";
 string strBorg = "Data/old_castle.obj";
@@ -38,6 +40,9 @@ Object objBallista(strBallista);
 Object objBorg(strBorg);
 Object objBow(strBow);
 Object objSwordman(strMan);
+Object objPalm1(strPalm);
+
+GLFWimage image;
 
 
 int frames = 0;
@@ -46,10 +51,14 @@ double t0 = 0.0;
 char titlestring[200];
 double current_time = 0.0;
 float _heightTranslate = 0.0;
+vector<int> Randoms = vector<int>();
+vector<int> Randoms2 = vector<int>();
 
-GLuint textureTest[6];
+GLuint textureTest[7];
  
 GLfloat	fogColor[4] = {0.5f,0.5f,0.5f,1.0f};
+
+GLfloat borgflytt[3] = {-100.0f, _heightTranslate+15, 400.0f};
 
 vector<GLfloat> vertices;
 vector<GLfloat> texcoords;
@@ -58,6 +67,9 @@ vector<GLuint> indices;
 
 Terrain* _terrain;
 GLUquadric *myQuad;
+
+
+
 
 //Loads a terrain from a heightmap.  The heights of the terrain range from
 //-height / 2 to height / 2.
@@ -182,14 +194,16 @@ void Init(void)
 	  Shut_Down(1);
 	
 
-
-	objBorg.createBoundingBox();
-
-
-
+	//objBorg.createBoundingBox();
+	//objBorg.min.setX(objBorg.min.getX()+borgflytt[0]);
+	//objBorg.min.setY(objBorg.min.getY()+borgflytt[1]);
+	//objBorg.min.setZ(objBorg.min.getZ()+borgflytt[2]);
+	//objBorg.max.setX(objBorg.max.getX()+borgflytt[0]);
+	//objBorg.max.setY(objBorg.max.getY()+borgflytt[1]);
+	//objBorg.max.setZ(objBorg.max.getZ()+borgflytt[2]);
+	
 
 	glfwDisable(GLFW_MOUSE_CURSOR); // Hide the mouse cursor
-	//glfwSetWindowTitle("TEST LOL");
 	
 	setProjectionMatrix ();
 	setViewMatrix();
@@ -211,11 +225,11 @@ void Init(void)
 	glEnable(GL_CULL_FACE);								// Do not draw polygons facing away from us
 
 	//Skapa texturer
-	glGenTextures(6, textureTest);
+	glGenTextures(7, textureTest);
 	glBindTexture(GL_TEXTURE_2D, textureTest[0]); // Activate first texture
     glfwLoadTexture2D("Data/UV_2.tga", GLFW_BUILD_MIPMAPS_BIT); // Load image
     glBindTexture(GL_TEXTURE_2D, textureTest[1]); // Activate second texture
-    glfwLoadTexture2D("Data/UV_old_castle_TAG.tga", GLFW_BUILD_MIPMAPS_BIT);
+    glfwLoadTexture2D("Data/UV_old_castle_Heli.tga", GLFW_BUILD_MIPMAPS_BIT);
 	glBindTexture(GL_TEXTURE_2D, textureTest[2]); // Activate second texture
     glfwLoadTexture2D("Data/grass.tga", GLFW_BUILD_MIPMAPS_BIT);
 	glBindTexture(GL_TEXTURE_2D, textureTest[3]);
@@ -224,13 +238,38 @@ void Init(void)
 	glfwLoadTexture2D("Data/sky.tga", GLFW_BUILD_MIPMAPS_BIT);	
 	glBindTexture(GL_TEXTURE_2D, textureTest[5]);
 	glfwLoadTexture2D("Data/swordman.tga", GLFW_BUILD_MIPMAPS_BIT);	
+	glBindTexture(GL_TEXTURE_2D, textureTest[6]);
+	glfwLoadTexture2D("Data/tree2.tga",  GLFW_ALPHA_MAP_BIT);	
 
+
+
+	FixaRands();
 	
 
 	//FOG();
 
 
 
+}
+
+void FixaRands()
+{
+	for(int i =0; i<20; i++)
+	{
+		Randoms.push_back(rand() %500 + rand() %100);
+	}
+	for(int i =0; i<20; i++)
+	{
+		Randoms.push_back(-rand() %500 - rand() %100);
+	}
+		for(int i =0; i<20; i++)
+	{
+		Randoms2.push_back(rand() %500 + rand() %100);
+	}
+	for(int i =0; i<20; i++)
+	{
+		Randoms2.push_back(-rand() %500 - rand() %100);
+	}
 }
 
 void FOG()
@@ -267,7 +306,6 @@ void Main_Loop(void)
 	tempScale(scaleH);
 
 
-
   while(1)  // This just loops as long as the program runs
   {	
 	  double current_time = glfwGetTime();
@@ -280,7 +318,7 @@ void Main_Loop(void)
     glEnable(GL_LIGHT0);
 	
 
-		Draw(); // Draw everything
+	Draw(); // Draw everything
 
 	glDisable(GL_LIGHTING);
     glDisable(GL_LIGHT0);
@@ -288,7 +326,7 @@ void Main_Loop(void)
 	if( Fired())
 	{
 		calculate_Arrow(current_time);
-		CheckCollision(_terrain, current_time, scaleH);
+		CheckCollision(_terrain, current_time, scaleH, objBorg);
 		
 	}
 	
@@ -307,14 +345,8 @@ void Main_Loop(void)
 
 void LIGHT()
 {
-	//GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f};
-	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
-	//GLfloat lightColor0[] = {0.6f, 0.6f, 0.6f, 0.0f};
-	//GLfloat lightPos0[] = {-0.0f, 50.0f, 0.0f, 0.0f};
-	////glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
-	//glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
-	//glLightfv(GL_LIGHT0, GL_AMBIENT_AND_DIFFUSE, lightColor0);
-	 GLfloat lightpos[4]={0.0f, 0.0f, 0.0f, 5.0f};
+
+	GLfloat lightpos[4]={0.0f, 0.0f, 0.0f, 5.0f};
 	glLightfv(GL_LIGHT0, GL_POSITION,lightpos);
 }
 
@@ -373,8 +405,7 @@ void Draw(void)
 {
 	 // Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
-	
-	
+
     // Reset the matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity(); 
@@ -407,10 +438,13 @@ void Draw(void)
 			glPushMatrix();		
 				//Matrismultiplikationer som rör Pilen här!
 			glRotatef(270.0f,0,1,0);
+			//glTranslatef(-7,0.0f,0.0f);
 			if(!getCollision()&& !Fired())
 			{
-				glTranslatef(-9.0f,1.5f,0.4f);
+
+				glTranslatef(getArrowBack(),1.5f,0.4f);
 				glRotatef(6.0f,0,0,1);
+
 			}
 			else
 			{
@@ -426,11 +460,29 @@ void Draw(void)
 		glPushMatrix();
 			//Matrismultiplikationer som rör Borgen här!	
 			glTranslatef(-100.0f, _heightTranslate+15, 400.0f);
-			glRotatef(45.0f,0,1,0);
-			glScalef(15.0f,15.0f, 15.0f);
+	glRotatef(45.0f,0,1,0);
+			glScalef(1.0f,1.0f, 1.0f);
 			glBindTexture(GL_TEXTURE_2D, textureTest[1]);
 			objBorg.DrawObject();		
 		glPopMatrix();
+
+		//Palmer
+			glBindTexture(GL_TEXTURE_2D, textureTest[6]);
+			for(int i =0; i<20; i++)
+			{
+				glPushMatrix();
+					glTranslatef(Randoms2.at(i),_heightTranslate+15, Randoms.at(i));
+					objPalm1.DrawObject();
+				glPopMatrix();
+			}
+			for(int i =0; i<20; i++)
+			{
+				glPushMatrix();
+					glTranslatef(Randoms2.at(i),_heightTranslate+15, -Randoms.at(i));
+					objPalm1.DrawObject();
+				glPopMatrix();
+			}
+
 		
 		glPushMatrix();
 			glTranslatef(5,0,5);
@@ -451,3 +503,4 @@ void Draw(void)
 
     // ----- Stop Drawing Stuff! ------
 }
+
